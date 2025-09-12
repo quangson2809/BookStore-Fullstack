@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:58837",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\Admin\\OneDrive\\Desktop\\UTC\\project\\BOOKSTORE\\BOOKSTORE\\bookstore.Server\\..\\bookstore.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

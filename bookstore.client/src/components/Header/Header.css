@@ -1,0 +1,598 @@
+﻿/* Reset và base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Header wrapper */
+.bookstore-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Top bar */
+.bookstore-top-bar {
+  background-color: #2d8f3f;
+  color: white;
+  font-size: 12px;
+  height: 32px;
+}
+
+.bookstore-top-bar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  height: 100%;
+}
+
+.bookstore-top-bar-left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  height: 100%;
+}
+
+.bookstore-top-bar-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 100%;
+}
+
+.bookstore-top-bar-link {
+  color: white;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+  font-size: 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.bookstore-top-bar-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main header */
+.bookstore-main-header {
+  background-color: white;
+  border-bottom: 1px solid #e9ecef;
+  height: 70px; /* Tăng height để fit buttons mới */
+}
+
+.bookstore-header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0;
+  height: 100%;
+}
+
+/* Logo */
+.bookstore-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #2d8f3f;
+  font-weight: 700;
+  font-size: 18px;
+  min-width: 180px;
+  height: 100%;
+}
+
+.bookstore-logo-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.bookstore-logo-text {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Search section */
+.bookstore-search-section {
+  flex: 1;
+  max-width: 500px;
+  height: 40px; /* Tăng height */
+}
+
+.bookstore-search-form {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #e9ecef;
+  border-radius: 8px; /* Bo tròn nhiều hơn */
+  overflow: hidden;
+  background-color: white;
+  transition: border-color 0.3s;
+}
+
+.bookstore-search-form:focus-within {
+  border-color: #2d8f3f;
+}
+
+.bookstore-search-input {
+  flex: 1;
+  padding: 0 16px; /* Tăng padding */
+  border: none;
+  outline: none;
+  font-size: 14px; /* Tăng font size */
+  background-color: transparent;
+  height: 100%;
+}
+
+.bookstore-search-input::placeholder {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.bookstore-search-btn {
+  background-color: #2d8f3f;
+  color: white;
+  border: none;
+  padding: 0 18px; /* Tăng padding */
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 50px; /* Tăng width */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookstore-search-btn:hover {
+  background-color: #246b32;
+}
+
+/* Header actions */
+.bookstore-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px; /* Tăng min-width để fit buttons mới */
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.bookstore-cart-link {
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.bookstore-cart-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: #333;
+  position: relative;
+  height: 40px; /* Tăng height */
+}
+
+.bookstore-cart-button:hover {
+  background-color: #f5f5f5;
+}
+
+.bookstore-action-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.bookstore-action-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bookstore-cart-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Auth buttons - THEO MẪU HÌNH */
+.bookstore-auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.bookstore-login-btn, .bookstore-register-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px; /* Padding lớn hơn */
+  border-radius: 6px; /* Bo tròn nhiều hơn */
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+  height: 40px; /* Height chuẩn như hình */
+  border: none;
+  cursor: pointer;
+}
+
+/* Login button - ghost style với icon */
+.bookstore-login-btn {
+  background: transparent;
+  color: #333;
+  border: 1px solid transparent;
+}
+
+.bookstore-login-btn:hover {
+  background-color: #f8f9fa;
+  color: #2d8f3f;
+}
+
+.bookstore-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Register button - primary style như hình */
+.bookstore-register-btn {
+  background-color: #2d8f3f;
+  color: white;
+  border: 1px solid #2d8f3f;
+}
+
+.bookstore-register-btn:hover {
+  background-color: #246b32;
+  border-color: #246b32;
+}
+
+/* Mobile menu toggle */
+.bookstore-mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookstore-menu-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Category section */
+.bookstore-category-section {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  height: 50px; /* Tăng height cho category */
+}
+
+.bookstore-category-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0;
+  height: 100%;
+}
+
+/* Category dropdown */
+.bookstore-category-dropdown {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.bookstore-category-trigger {
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  height: 36px;
+}
+
+.bookstore-category-trigger svg {
+  width: 12px;
+  height: 12px;
+}
+
+.bookstore-category-trigger:hover {
+  background-color: #2d8f3f;
+  color: white;
+}
+
+.bookstore-category-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 320px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 1001;
+  top: 100%;
+  left: 0;
+  padding: 12px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.bookstore-category-dropdown:hover .bookstore-category-dropdown-content {
+  display: grid;
+}
+
+.bookstore-category-dropdown-item {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+  font-size: 14px;
+  border-radius: 4px;
+  margin: 0 8px;
+}
+
+.bookstore-category-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Category items */
+.bookstore-category-item {
+  color: #333;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.3s;
+  font-size: 14px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.bookstore-category-item:hover {
+  background-color: #2d8f3f;
+  color: white;
+}
+
+.bookstore-category-item.bookstore-special {
+  color: #2d8f3f;
+  font-weight: 600;
+}
+
+.bookstore-category-item.bookstore-special:hover {
+  background-color: #2d8f3f;
+  color: white;
+}
+
+.bookstore-category-item.bookstore-hide-on-small {
+  display: block;
+}
+
+/* Container */
+.bookstore-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 100%;
+}
+
+/* Mobile menu */
+.bookstore-mobile-menu {
+  display: none;
+  background-color: white;
+  border-top: 1px solid #e9ecef;
+}
+
+.bookstore-mobile-content {
+  padding: 20px 0;
+}
+
+.bookstore-mobile-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.bookstore-mobile-category-item {
+  color: #333;
+  text-decoration: none;
+  padding: 12px 0;
+  font-weight: 500;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 15px;
+}
+
+.bookstore-mobile-auth {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.bookstore-mobile-auth-button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+}
+
+.bookstore-mobile-auth-button.bookstore-outline {
+  background: transparent;
+  border: 1px solid #2d8f3f;
+  color: #2d8f3f;
+}
+
+.bookstore-mobile-auth-button:not(.bookstore-outline) {
+  background-color: #2d8f3f;
+  color: white;
+}
+
+.bookstore-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bookstore-mobile-links a {
+  color: #666;
+  text-decoration: none;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .bookstore-category-menu {
+    gap: 15px;
+  }
+  
+  .bookstore-category-item.bookstore-hide-on-small {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .bookstore-top-bar {
+    height: auto;
+  }
+  
+  .bookstore-top-bar-content {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .bookstore-top-bar-left {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bookstore-main-header {
+    height: auto;
+  }
+  
+  .bookstore-header-content {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 0;
+    height: auto;
+  }
+
+  .bookstore-logo {
+    min-width: auto;
+    order: 1;
+    font-size: 16px;
+  }
+
+  .bookstore-search-section {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    height: 40px;
+  }
+
+  .bookstore-header-actions {
+    order: 2;
+    min-width: auto;
+    gap: 8px;
+  }
+
+  .bookstore-auth-buttons .bookstore-action-text {
+    display: none;
+  }
+
+  .bookstore-mobile-menu-toggle {
+    display: flex;
+  }
+
+  .bookstore-category-section {
+    display: none;
+  }
+
+  .bookstore-mobile-menu {
+    display: block;
+  }
+
+  .bookstore-container {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bookstore-header-content {
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .bookstore-auth-buttons {
+    gap: 6px;
+  }
+
+  .bookstore-login-btn, .bookstore-register-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    height: 32px;
+  }
+
+  .bookstore-search-section {
+    height: 36px;
+  }
+
+  .bookstore-search-input {
+    font-size: 12px;
+  }
+
+  .bookstore-search-btn {
+    width: 40px;
+  }
+
+  .bookstore-logo-text {
+    font-size: 14px;
+  }
+}

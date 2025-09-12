@@ -1,0 +1,14 @@
+.home {
+  width: 100%;
+}
+
+.banner-section {
+  padding: 2rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .banner-section {
+    padding: 1rem 0;
+  }
+}

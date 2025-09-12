@@ -1,0 +1,343 @@
+﻿/* =================
+   LOGIN FORM STYLES (Giữ nguyên)
+   ================= */
+.login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.login-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+}
+
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.login-description {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.login-content {
+  padding: 0 2rem 2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.login-form-input {
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background-color: white;
+  outline: none;
+  width: 100%;
+}
+
+.login-form-input:focus {
+  border-color: #2d8f3f;
+  box-shadow: 0 0 0 3px rgba(45, 143, 63, 0.1);
+}
+
+.login-form-input::placeholder {
+  color: #999;
+}
+
+.login-password-container {
+  position: relative;
+}
+
+.login-password-input {
+  padding-right: 45px !important;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  transition: color 0.3s ease;
+  z-index: 1;
+}
+
+.login-password-toggle:hover {
+  color: #2d8f3f;
+}
+
+.login-submit-btn {
+  background-color: #2d8f3f;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+  background-color: #246b32;
+  transform: translateY(-1px);
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-footer {
+  text-align: center;
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.login-footer-text {
+  color: #666;
+}
+
+.login-link {
+  color: #2d8f3f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.login-link:hover {
+  color: #246b32;
+  text-decoration: underline;
+}
+
+/* =================
+   REGISTER FORM STYLES - STYLE CŨ ĐƠN GIẢN
+   ================= */
+.auth-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.auth-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.auth-description {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.auth-content {
+  padding: 0 2rem 2rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background-color: white;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #2d8f3f;
+  box-shadow: 0 0 0 3px rgba(45, 143, 63, 0.1);
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.password-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #2d8f3f;
+}
+
+.auth-submit-btn {
+  background-color: #2d8f3f;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background-color: #246b32;
+  transform: translateY(-1px);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-divider {
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.divider-line {
+  height: 1px;
+  background-color: #e9ecef;
+}
+
+.auth-footer {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.auth-footer-text {
+  color: #666;
+}
+
+.auth-link {
+  color: #2d8f3f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+  color: #246b32;
+  text-decoration: underline;
+}
+
+/* ===============
+   RESPONSIVE
+   =============== */
+@media (max-width: 480px) {
+  .login-card {
+    max-width: 100%;
+    margin: 0 20px;
+  }
+  
+  .login-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .login-content {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  .auth-card {
+    max-width: 100%;
+    margin: 0 20px;
+  }
+  
+  .auth-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .auth-content {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  .auth-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
