@@ -104,13 +104,14 @@ const BookManagement: React.FC = () => {
     return (
       <div className="book-management">
         <div className="loading-container">
-          <div className="loading-spinner"></div>
+          <div className="loading-spinner">
+          </div>
           <p>Đang tải danh sách sách...</p>
         </div>
       </div>
     );
   }
-
+  
   return (
     <div className="book-management">
       <div className="management-header">
@@ -141,7 +142,7 @@ const BookManagement: React.FC = () => {
           </button>
         </div>
       </div>
-      
+        
       <div className="books-table-container">
         <table className="books-table">
           <thead>

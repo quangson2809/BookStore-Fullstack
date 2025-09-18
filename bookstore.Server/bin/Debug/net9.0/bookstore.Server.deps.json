@@ -9,7 +9,7 @@
       "bookstore.Server/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": "9.0.8",
-          "Microsoft.AspNetCore.SpaProxy": "9.0.8"
+          "Microsoft.AspNetCore.SpaProxy": "9.0.9"
         },
         "runtime": {
           "bookstore.Server.dll": {}
@@ -26,11 +26,11 @@
           }
         }
       },
-      "Microsoft.AspNetCore.SpaProxy/9.0.8": {
+      "Microsoft.AspNetCore.SpaProxy/9.0.9": {
         "runtime": {
           "lib/net9.0/Microsoft.AspNetCore.SpaProxy.dll": {
-            "assemblyVersion": "9.0.8.0",
-            "fileVersion": "9.0.825.36808"
+            "assemblyVersion": "9.0.9.0",
+            "fileVersion": "9.0.925.42003"
           }
         }
       },
@@ -57,12 +57,12 @@
       "path": "microsoft.aspnetcore.openapi/9.0.8",
       "hashPath": "microsoft.aspnetcore.openapi.9.0.8.nupkg.sha512"
     },
-    "Microsoft.AspNetCore.SpaProxy/9.0.8": {
+    "Microsoft.AspNetCore.SpaProxy/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-wtoqtaMMWQGxYXqNwGm9aCZ/Ks3ehKc1lGvH5EtJ0QTLN1eg3nCW1Do6QbQHWQ9ST9aaCoTMCQy2yF/Dbmau+g==",
-      "path": "microsoft.aspnetcore.spaproxy/9.0.8",
-      "hashPath": "microsoft.aspnetcore.spaproxy.9.0.8.nupkg.sha512"
+      "sha512": "sha512-4OcpPFPPs+DEf0EH7Qs9DS+Btan6F2GGD5wnv7fOXNCUBpIWi+zj2mWmNpkwhOXDOBSMObeHI/+MB6p4BsnhAQ==",
+      "path": "microsoft.aspnetcore.spaproxy/9.0.9",
+      "hashPath": "microsoft.aspnetcore.spaproxy.9.0.9.nupkg.sha512"
     },
     "Microsoft.OpenApi/1.6.17": {
       "type": "package",

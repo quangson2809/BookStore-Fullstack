@@ -22,4 +22,14 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Services\" />
+    <Folder Include="Validators\" />
+    <Folder Include="Middlewares\" />
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>

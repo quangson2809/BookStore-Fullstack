@@ -1,0 +1,14 @@
+.vs/
+bin/
+obj/
+node_modules/
+build/
+dist/
+.env
+Controllers/
+DATA/
+Models/
+obj/
+Properties/
+Views/
+wwwroot/
