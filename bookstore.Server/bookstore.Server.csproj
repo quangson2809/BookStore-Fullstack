@@ -23,13 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="DTOs\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Services\" />
-    <Folder Include="Validators\" />
+    <Folder Include="DTOs\Books\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="Data\" />
+    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Services\implementations\" />
   </ItemGroup>
 
 </Project>
