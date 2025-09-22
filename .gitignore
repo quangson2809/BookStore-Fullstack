@@ -4,9 +4,7 @@ obj/
 node_modules/
 build/
 dist/
-.env
-Controllers/
-DATA/
+.envs
 Models/
 obj/
 Properties/
