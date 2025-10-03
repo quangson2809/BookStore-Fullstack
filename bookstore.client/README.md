@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+﻿# React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -67,3 +67,19 @@ export default tseslint.config([
   },
 ])
 ```
+
+set ath: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+--BE
+1. vào file create.sql , chạy file để tạo database
+2. vào connected service , tạo kết nôi với server localdb và database đã tạo
+3.cài và update entity framework core tools.
+chạy trên bash các lệnh:
+    -dotnet tool update --global dotnet-ef
+    -dotnet tool update --global dotnet-ef
+4, build dự án:
+    - dotnet build        
+5. test ánh xạ Db:
+Chạy trong Package Manager Console (PMC)
+Vào Visual Studio → menu Tools → NuGet Package Manager → Package Manager Console.
+    -Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=BookStoreDB;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context BookStoreDbContext -f
