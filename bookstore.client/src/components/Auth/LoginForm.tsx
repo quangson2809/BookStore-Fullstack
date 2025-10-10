@@ -1,37 +1,56 @@
 ﻿import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AuthForms.css';
+import axios from 'axios';
+import { error } from 'console';
 
 interface LoginFormProps {
   onSuccess?: () => void;
 }
-
-const LoginForm = ({ onSuccess }: LoginFormProps) => {
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+interface CustomerLoginRequest {
+    PhoneNumber: string,
+    Password: string
+}
+const LoginForm = () => {
+  
+  const [FormData, setFormData] = useState<CustomerLoginRequest>({
+        PhoneNumber: '',
+        Password:''
+   })
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [Error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+      e.preventDefault();
+      setError('');
+      setIsLoading(true);
 
-    try {
-      // Mock login - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (phone && password) {
-        alert('Đăng nhập thành công!');
-        onSuccess?.();
-      } else {
-        alert('Số điện thoại hoặc mật khẩu không chính xác');
-      }
-    } catch (error) {
-      alert('Có lỗi xảy ra khi đăng nhập');
-    } finally {
-      setIsLoading(false);
-    }
+      try {
+          const response = await axios.post('http://localhost:5121/api/Auth/customer/login', FormData);
+          // Mock login - replace with actual API call
+          //await new Promise(resolve => setTimeout(resolve, 1000));
+          const { success, message } = response.data;
+
+          if ( success ) {
+              alert(message);
+              console.log(message);
+              navigate('/cart');
+          } else {
+            setError(message);
+          }
+      } catch (error) {
+          alert(Error);
+       } finally {
+            setIsLoading(false);
+        }
   };
+
+    const handleInputChange = (fied: keyof CustomerLoginRequest, value: string) => {
+        setFormData(prev => ({ ...prev, [fied]: value }));
+        if (Error) setError('');
+    };
 
   return (
     <div className="login-card">
@@ -42,14 +61,25 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
       
       <div className="login-content">
         <form onSubmit={handleSubmit} className="login-form">
+            {Error && (
+                <div className="error-message">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="15" y1="9" x2="9" y2="15" />
+                        <line x1="9" y1="9" x2="15" y2="15" />
+                    </svg>
+                    {Error}
+                </div>
+            )}
+
           <div className="login-form-group">
             <label htmlFor="phone" className="login-form-label">Số điện thoại</label>
             <input
               id="phone"
               type="tel"
               placeholder="0123456789"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              value={FormData.PhoneNumber}
+              onChange={(e) => handleInputChange('PhoneNumber', e.target.value)}
               className="login-form-input"
               required
             />
@@ -62,8 +92,8 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Nhập mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={FormData.Password}
+                onChange={(e) => handleInputChange('Password',e.target.value)}
                 className="login-form-input login-password-input"
                 required
               />

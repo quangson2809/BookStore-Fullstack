@@ -1,6 +1,6 @@
 ﻿using bookstore.Server.Entities;
 using bookstore.Server.Repositories.Interfaces;
-using bookstore.Server.Database;
+using bookstore.Server.Data;
 
 namespace bookstore.Server.Repositories.Implementations
 {

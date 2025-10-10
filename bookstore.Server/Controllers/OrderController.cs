@@ -2,11 +2,9 @@
 
 namespace bookstore.Server.Controllers
 {
+    [ApiController]
     public class OrderController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
     }
 }

@@ -7,6 +7,7 @@ namespace bookstore.Server.Services.Interfaces
     {
         Task<LoginResponseDTO> AdminLoginAsync(AdminLoginRequestDTO request);
         Task<LoginResponseDTO> CustomerLoginAsync(CustomerLoginRequestDTO request);
+        Task<SignupResponseDTO> CustomerSignupAsync(CustomerSignupRequestDTO request);
         Task<bool> IsAuthenticatedAsync();
     }
 }

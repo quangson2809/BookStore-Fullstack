@@ -8,7 +8,7 @@ interface AdminLoginRequest {
 }
 
 const AdminLogin = () => {
-    const [formData, setFormData] = useState<AdminLoginRequest>({
+    const [FormData, setFormData] = useState<AdminLoginRequest>({
         Username: '',
         Password: ''
     });
@@ -23,17 +23,17 @@ const AdminLogin = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5121/api/admin/Auth/login', formData);
+            const response = await axios.post('http://localhost:5121/api/Auth/admin/login', FormData);
             // Mock admin login - replace with actual API call
             //await new Promise(resolve => setTimeout(resolve, 1000));
 
-            const { success,token, message } = response.data;
+            const { success,message } = response.data;
             // Mock validation - admin credentials
             if (success) {
                 // Store admin token/session
                 localStorage.setItem('adminToken', 'mock-admin-token');
                 localStorage.setItem('userRole', 'admin');
-                localStorage.setItem('adminUsername', formData.Username);
+                localStorage.setItem('adminUsername', FormData.Username);
 
                 alert(message);
                 navigate('/admin/dashboard'); // Redirect to admin dashboard
@@ -96,7 +96,7 @@ const AdminLogin = () => {
                                 id="admin-username"
                                 type="text"
                                 placeholder="Nhập tên đăng nhập"
-                                value={formData.Username}
+                                value={FormData.Username}
                                 onChange={(e) => handleInputChange('Username', e.target.value)}
                                 className="form-input"
                                 required
@@ -118,7 +118,7 @@ const AdminLogin = () => {
                                     id="admin-password"
                                     type={showPassword ? 'text' : 'Password'}
                                     placeholder="Nhập mật khẩu"
-                                    value={formData.Password}
+                                    value={FormData.Password}
                                     onChange={(e) => handleInputChange('Password', e.target.value)}
                                     className="form-input password-input"
                                     required
@@ -148,7 +148,7 @@ const AdminLogin = () => {
                         <button
                             type="submit"
                             className="admin-submit-btn"
-                            disabled={isLoading || !formData.Username || !formData.Password}
+                            disabled={isLoading || !FormData.Username || !FormData.Password}
                         >
                             {isLoading ? (
                                 <>
