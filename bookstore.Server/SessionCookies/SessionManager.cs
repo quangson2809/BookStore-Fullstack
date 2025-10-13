@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using bookstore.Server.Entities;
 namespace bookstore.Server.SessionCookies
 {
-    public class SessionManager : ISessionManager
+    public class SessionManager 
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -10,7 +11,7 @@ namespace bookstore.Server.SessionCookies
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public int GetCurrentUserId()
+        public int Get()
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null || httpContext.Session == null)
@@ -22,26 +23,29 @@ namespace bookstore.Server.SessionCookies
             {
                 throw new Exception("người dùng chưa đăng nhập hoặc session hết hạn");
             }
+            Console.WriteLine("============================Get" + ":" + userid.Value);
             return userid.Value;
         }
 
-        public void SetCurrentUserID(int UserId)
+        public async Task Set(User user)
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null || httpContext.Session == null)
             {
                 throw new Exception("Không có thông tin từ request");
             }
-            httpContext.Session.SetInt32("UserId", UserId);
+            httpContext.Session.SetInt32("UserId", user.UserId);
+            Console.WriteLine("============================Set" + ":" + user.UserId);
         }
 
-        public void ClearSessionState()
+        public void Clear()
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null || httpContext.Session == null)
             {
                 throw new Exception("HttpContext or Session is not available.");
             }
+            Console.WriteLine("============================Clear session");
             httpContext.Session.Clear();
         }
 

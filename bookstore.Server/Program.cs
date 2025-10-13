@@ -1,4 +1,4 @@
-﻿using bookstore.Server.Database;
+﻿using bookstore.Server.Data;
 using bookstore.Server.Repositories;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
@@ -22,6 +23,7 @@ builder.Services.AddControllers();
 
 // cấu hình DBcontext với SQL server
 var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
+
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -34,20 +36,26 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;// đảm bảo cookie được gửi ngay cả khi người dùng chưa đồng ý với chính sách cookie
     options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     options.Cookie.SameSite = SameSiteMode.Lax;
-
+    
 });
 
-// Đăng ký Authentication Cookie
+//cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/account/login";   // Redirect nếu chưa login
-        options.AccessDeniedPath = "/account/unauthorize403"; // Redirect nếu thiếu quyền
-    });
-builder.Services.AddScoped<AuthenticationCookie>();
+        options.Cookie.Name = "BookStoreAuthCookie";
+        options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);//expire time
+    }
+     );
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ISessionManager, SessionManager>();
+builder.Services.AddScoped<SessionManager>();
+builder.Services.AddScoped<AuthenticationCookieManager>();
+
+
 // đăng ký Repositoryies
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -88,6 +96,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapFallbackToFile("/index.html");

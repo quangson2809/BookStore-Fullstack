@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using bookstore.Server.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace bookstore.Server.Database;
+namespace bookstore.Server.Data;
 
 public partial class BookStoreDbContext : DbContext
 {
@@ -15,18 +15,7 @@ public partial class BookStoreDbContext : DbContext
         : base(options)
     {
     }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            optionsBuilder.UseSqlServer(config.GetConnectionString("BookStoreDb"));
-        }
-    }
+    
 
     public virtual DbSet<Author> Authors { get; set; }
 

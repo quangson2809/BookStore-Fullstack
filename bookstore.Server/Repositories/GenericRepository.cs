@@ -1,5 +1,6 @@
 ﻿namespace bookstore.Server.Repositories;
-using bookstore.Server.Database;
+
+using bookstore.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;

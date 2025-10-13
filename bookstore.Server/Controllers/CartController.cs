@@ -2,11 +2,9 @@
 
 namespace bookstore.Server.Controllers
 {
+    [ApiController]
     public class CartController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
     }
 }
