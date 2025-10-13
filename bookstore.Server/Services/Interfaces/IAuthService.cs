@@ -5,9 +5,9 @@ namespace bookstore.Server.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<LoginResponseDTO> AdminLoginAsync(AdminLoginRequestDTO request);
-        Task<LoginResponseDTO> CustomerLoginAsync(CustomerLoginRequestDTO request);
-        Task<SignupResponseDTO> CustomerSignupAsync(CustomerSignupRequestDTO request);
+        Task<StarusResponseDTO> AdminLoginAsync(AdminLoginRequestDTO request);
+        Task<StarusResponseDTO> CustomerLoginAsync(CustomerLoginRequestDTO request);
+        Task<StarusResponseDTO> CustomerSignupAsync(CustomerSignupRequestDTO request);
         Task<bool> IsAuthenticatedAsync();
     }
 }
