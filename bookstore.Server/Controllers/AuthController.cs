@@ -19,14 +19,14 @@ namespace bookstore.Server.Controllers
         }
 
         [HttpPost("admin/login")]
-        public async Task<IActionResult> AdminLogin([FromBody] AdminLoginRequestDTO request)
+        public async Task<IActionResult> AdminLogin([FromBody] AdminLoginRequest request)
         {
             var response = await _authService.AdminLoginAsync(request);
             return Ok(response);
         }
 
         [HttpPost("customer/login")]
-        public async Task<IActionResult> CustomerLogin([FromBody] CustomerLoginRequestDTO request)
+        public async Task<IActionResult> CustomerLogin([FromBody] CustomerLoginRequest request)
         {
             var response = await _authService.CustomerLoginAsync(request);
             return Ok(response);
@@ -43,7 +43,9 @@ namespace bookstore.Server.Controllers
         [HttpPost("admin/dashboard")]
         public async Task<IActionResult> AccessDashboad()
         {
-            return Ok(new StatusResponseDTO(true, " "));
+            return Ok(new StatusResponse(true, " "));
         }
+
+
     }
 }

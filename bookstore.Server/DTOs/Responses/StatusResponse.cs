@@ -1,11 +1,11 @@
 ﻿namespace bookstore.Server.DTOs.Responses
 {
-    public class StarusResponseDTO
+    public class StatusResponse
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
 
-        public StarusResponseDTO(Boolean status,  String message)
+        public StatusResponse(Boolean status,  String message)
         {
             Success = status;
             Message = message;
