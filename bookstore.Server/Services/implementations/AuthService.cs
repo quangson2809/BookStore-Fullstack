@@ -68,7 +68,7 @@ namespace bookstore.Server.Services.Implementations
 
             return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task<StatusResponse> CustomerSignupAsync(CustomerSignupRequestDTO request) {
+        public async Task<StatusResponse> CustomerSignupAsync(CustomerSignupRequest request) {
             User temp = await _userRepository.GetByPhone(request.PhoneNumber);
             if (temp != null )
             {
@@ -94,6 +94,8 @@ namespace bookstore.Server.Services.Implementations
 
             return new StatusResponse(true, "đăng ký thành công");
         }
+
+        
 
         public Task<bool> IsAuthenticatedAsync()
         {

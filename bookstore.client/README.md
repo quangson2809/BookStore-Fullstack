@@ -70,7 +70,8 @@ export default tseslint.config([
 
 set ath: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
---BE          
+--BE
+1. vào sql server tạo db tên BookstoreDb         
 2. vào connected service , tạo kết nôi với server localdb và database đã tạo
 3.cài và update entity framework core tools.
 chạy trên bash các lệnh:
@@ -88,7 +89,7 @@ chạy trên bash các lệnh:
     - dotnet ef migrations add AddMoreFieldsTo<entity>
     - dotnet ef migrations remove(nếu sai)
     - dotnet ef database update
-```5. test ánh xạ Db:
+``` test ánh xạ Db:
 Chạy trong Package Manager Console (PMC)
 Vào Visual Studio → menu Tools → NuGet Package Manager → Package Manager Console.
     -Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=BookStoreDB;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context BookStoreDbContext -f
