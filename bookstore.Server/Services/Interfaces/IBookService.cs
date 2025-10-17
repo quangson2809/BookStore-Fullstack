@@ -9,7 +9,7 @@ namespace bookstore.Server.Services.Interfaces
         // Define book-related methods here
         Task<StatusResponse> DeleteBook(int Id);
         Task<BookDetailResponse> GetBookDetail(int Id);
-        Task<ICollection<BookHomeOverviewResponse>> GetAllBook();
+        Task<IEnumerable<BookHomeOverviewResponse>> GetAllBook();
         
 
     }

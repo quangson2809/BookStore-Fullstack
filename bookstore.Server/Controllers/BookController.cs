@@ -1,4 +1,5 @@
 ﻿using bookstore.Server.DTOs.Requests;
+using bookstore.Server.DTOs.Responses;
 using bookstore.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +17,24 @@ namespace bookstore.Server.Controllers
 
         [Authorize(Roles ="Admin")]                
         [HttpPost("admin/addbook")]
-        public async Task AddBook<IActionResult>([FromBody] AddBookRequest request)
+        public async Task<IActionResult> AddBook([FromBody] AddBookRequest request)
         {
-
+            return Ok();
         }
 
         [HttpGet("bookdetail/{id}")]
-        public async Task GetBookDetail<IActionResult>() { 
-            
+        public async Task<IActionResult> GetBookDetail([FromRoute] int id) 
+        {
+
+            return Ok();
+
         }
 
         [HttpGet("allbook")]
-        public async Task GetListBook<IActionResult>()
+        public async Task<IActionResult> GetAllBook()
         {
-
+            var items =await _bookService.GetAllBook();
+            return Ok(items);
         }
 
         [HttpGet("Search")]

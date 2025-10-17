@@ -33,7 +33,7 @@ namespace bookstore.Server.Controllers
         }
 
         [HttpPost("customer/signup")]
-        public async Task<IActionResult> CustomerSignup([FromBody] CustomerSignupRequestDTO request)
+        public async Task<IActionResult> CustomerSignup([FromBody] CustomerSignupRequest request)
         {
             var response = _authService.CustomerSignupAsync(request);
             return Ok();
