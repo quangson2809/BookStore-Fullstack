@@ -239,5 +239,5 @@ C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.
 C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.0\bookstore.Server.pdb
 C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.0\bookstore.Server.genruntimeconfig.cache
 C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.0\ref\bookstore.Server.dll
-C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\bin\Debug\net9.0\bookstore.Server.staticwebassets.runtime.json
+C:\Users\Admin\source\repos\BOOKSTORE_Fullstack\bookstore.Server\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

@@ -84,13 +84,10 @@ chạy trên bash các lệnh:
     - dotnet build
 5, tạo các bảng trong DB 
     - dotnet ef migrations add InitialCreate --project bookstore.Server --startup-project bookstore.Server
+    - dotnet ef database update --project bookstore.Server --startup-project bookstore.Server -v
+
 6, thêm các trường dữ liệu
     - dotnet build
-    - dotnet ef migrations add AddMoreFieldsTo<entity>
+    -  dotnet ef migrations add <action><entity><field>Column --project bookstore.Server --startup-project bookstore.Server
     - dotnet ef migrations remove(nếu sai)
-    - dotnet ef database update
-``` test ánh xạ Db:
-Chạy trong Package Manager Console (PMC)
-Vào Visual Studio → menu Tools → NuGet Package Manager → Package Manager Console.
-    -Scaffold-DbContext "Data Source=(localdb)\mssqllocaldb;Initial Catalog=BookStoreDB;Integrated Security=True;MultipleActiveResultSets=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context BookStoreDbContext -f
-```
+    - dotnet ef database update --project bookstore.Server --startup-project bookstore.Server -v
