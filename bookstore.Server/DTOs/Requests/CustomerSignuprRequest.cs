@@ -1,6 +1,6 @@
 ﻿namespace bookstore.Server.DTOs.Requests
 {
-    public class CustomerSignupRequestDTO
+    public class CustomerSignupRequest
     {
         public String FirstName { get; set; }
         public String LastName { get; set; }

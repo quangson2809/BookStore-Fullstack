@@ -10,6 +10,6 @@ namespace bookstore.Server.Services.implementations
 {
     public class CartService : ICartService
     {
-        // Implement cart-related methods here
+        // Implement cart-  related methods here
     }
 }

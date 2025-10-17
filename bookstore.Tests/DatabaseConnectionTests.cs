@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading.Tasks;
-using bookstore.Server.Database;              // DbContext của bạn
 using Microsoft.EntityFrameworkCore;          // DbContextOptionsBuilder
 using Microsoft.Extensions.Configuration;     // ConfigurationBuilder
 using Xunit;
+using bookstore.Server.Data;
 
 namespace bookstore.Tests
 {
@@ -40,6 +40,7 @@ namespace bookstore.Tests
             var canConnect = await context.Database.CanConnectAsync();
 
             Assert.True(canConnect, "Không thể kết nối đến cơ sở dữ liệu." + _connectionString + "_+_+_+_+_+_+_+_");
+            Console.WriteLine("====================Kết nối đến cơ sở dữ liệu thành công.");
         }
     }
 }

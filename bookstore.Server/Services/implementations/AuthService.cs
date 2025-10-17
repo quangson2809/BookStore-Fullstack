@@ -26,22 +26,15 @@ namespace bookstore.Server.Services.Implementations
             _authCookieManager = authCookieManager;
         }
 
-<<<<<<< HEAD
-        public async Task<StatusResponseDTO> AdminLoginAsync(AdminLoginRequestDTO request)
-=======
-        public async Task<StarusResponseDTO> AdminLoginAsync(AdminLoginRequestDTO request)
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
+        public async Task<StatusResponse> AdminLoginAsync(AdminLoginRequest request)
+
         {   
             
             // Giả lập: chỉ cho phép "Admin" / "adminpass"
             User user = await _userRepository.GetByFirstName(request.Username);
             if (user == null)
             {
-<<<<<<< HEAD
-                return new StatusResponseDTO(false, "Tên đăng nhập hoặc mật khẩu không dúng");
-=======
-                return new StarusResponseDTO(false, "Tên đăng nhập hoặc mật khẩu không dúng");
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
+                return new StatusResponse(false, "Tên đăng nhập hoặc mật khẩu không dúng");
             }
 
             if ( request.Password == user.PasswordHash)
@@ -50,30 +43,18 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
-<<<<<<< HEAD
-                return new StatusResponseDTO(true, "Đăng nhập thành công");
+                return new StatusResponse(true, "Đăng nhập thành công");
             }
 
-            return new StatusResponseDTO(false, "Tên đăng nhập hoặc mật khẩu không dúng");
+            return new StatusResponse(false, "Tên đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task <StatusResponseDTO> CustomerLoginAsync(CustomerLoginRequestDTO request)
-=======
-                return new StarusResponseDTO(true, "Đăng nhập thành công");
-            }
-
-            return new StarusResponseDTO(false, "Tên đăng nhập hoặc mật khẩu không dúng");
-        }
-        public async Task <StarusResponseDTO> CustomerLoginAsync(CustomerLoginRequestDTO request)
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
+        public async Task <StatusResponse> CustomerLoginAsync(CustomerLoginRequest request)    
         {
             User user = await _userRepository.GetByPhone(request.PhoneNumber);
             if (user == null)
             {
-<<<<<<< HEAD
-                return new StatusResponseDTO(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
-=======
-                return new StarusResponseDTO(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
+                return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
+
             }
 
             if (request.Password == user.PasswordHash)
@@ -82,30 +63,18 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
-<<<<<<< HEAD
-                return new StatusResponseDTO(true, "Đăng nhập thành công");
+                return new StatusResponse(true, "Đăng nhập thành công");
             }
 
-            return new StatusResponseDTO(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
+            return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task<StatusResponseDTO> CustomerSignupAsync(CustomerSignupRequestDTO request) {
+        public async Task<StatusResponse> CustomerSignupAsync(CustomerSignupRequest request) {
             User temp = await _userRepository.GetByPhone(request.PhoneNumber);
             if (temp != null )
             {
-                return new StatusResponseDTO(false, "Sdt đã tồn tại");
-=======
-                return new StarusResponseDTO(true, "Đăng nhập thành công");
+                return new StatusResponse(false, "Sdt đã tồn tại");
             }
-
-            return new StarusResponseDTO(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
-        }
-        public async Task<StarusResponseDTO> CustomerSignupAsync(CustomerSignupRequestDTO request) {
-            User temp = await _userRepository.GetByPhone(request.PhoneNumber);
-            if (temp != null )
-            {
-                return new StarusResponseDTO(false, "Sdt đã tồn tại");
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
-            }
+      
 
             User u = new User
             {
@@ -123,12 +92,10 @@ namespace bookstore.Server.Services.Implementations
             await _authCookieManager.Set(user);
             await _sessionManager.Set(user);
 
-<<<<<<< HEAD
-            return new StatusResponseDTO(true, "đăng ký thành công");
-=======
-            return new StarusResponseDTO(true, "đăng ký thành công");
->>>>>>> 156f8e592a3358334cc0340d59054de2fee9e9dc
+            return new StatusResponse(true, "đăng ký thành công");
         }
+
+        
 
         public Task<bool> IsAuthenticatedAsync()
         {
