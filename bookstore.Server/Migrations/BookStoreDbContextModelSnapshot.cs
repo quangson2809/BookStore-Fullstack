@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using bookstore.Server.Data;
 
 #nullable disable
 
-namespace bookstore.Server.Data.Migrations
+namespace bookstore.Server.Migrations
 {
     [DbContext(typeof(BookStoreDbContext))]
     partial class BookStoreDbContextModelSnapshot : ModelSnapshot
@@ -74,6 +75,10 @@ namespace bookstore.Server.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("ISBN");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(10, 2)")

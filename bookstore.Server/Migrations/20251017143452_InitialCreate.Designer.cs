@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using bookstore.Server.Data;
 
 #nullable disable
 
-namespace bookstore.Server.Data.Migrations
+namespace bookstore.Server.Migrations
 {
     [DbContext(typeof(BookStoreDbContext))]
-    [Migration("20251006143007_InitialCreate")]
+    [Migration("20251017143452_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -77,6 +78,10 @@ namespace bookstore.Server.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("ISBN");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(10, 2)")

@@ -9,6 +9,7 @@ namespace bookstore.Server.DTOs.Responses
         public string PublisherName { get; set; }
         public decimal SalePrice { get; set; }
         public int StockQuantity { get; set; }
+        public string Language { get; set; }
 
         public BookHomeOverviewResponse(Book book) {
             foreach (var bookimage in book.BookImages)
@@ -23,7 +24,7 @@ namespace bookstore.Server.DTOs.Responses
             PublisherName = book.Publisher.PublisherName;
             SalePrice = (decimal)book.SalePrice;
             StockQuantity = (int)book.StockQuantity;
-
+            Language = book.Language;
         }
 
     }
