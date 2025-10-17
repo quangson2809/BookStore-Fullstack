@@ -1,4 +1,4 @@
-using bookstore.Server.DTOs.Requests;
+﻿using bookstore.Server.DTOs.Requests;
 using bookstore.Server.DTOs.Responses;
 using bookstore.Server.Services.Interfaces;
 using bookstore.Server.Repositories;
@@ -35,7 +35,7 @@ namespace bookstore.Server.Services.implementations
 
         public async Task<BookDetailResponse> GetBookDetail(int Id)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("chưa được thực thi");
 
         }
     }

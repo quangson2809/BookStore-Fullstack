@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace bookstore.Server.Data.Migrations
+namespace bookstore.Server.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -89,6 +89,7 @@ namespace bookstore.Server.Data.Migrations
                     Publish_Time = table.Column<DateOnly>(type: "date", nullable: true),
                     Stock_Quantity = table.Column<int>(type: "int", nullable: true, defaultValue: 0),
                     ISBN = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Language = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Page_number = table.Column<int>(type: "int", nullable: true),
                     Category_Id = table.Column<int>(type: "int", nullable: true),
                     Publisher_Id = table.Column<int>(type: "int", nullable: true),

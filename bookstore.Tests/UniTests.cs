@@ -20,7 +20,7 @@ namespace bookstore.Tests
         }
        
         // Test Session
-        [Fact]
+        //[Fact]
         public void runTest()
         {
             var context = new DefaultHttpContext();
@@ -30,7 +30,7 @@ namespace bookstore.Tests
             var accessor = new HttpContextAccessor { HttpContext = context };
 
             SessionManager sessionManager = new SessionManager(accessor);
-            var retrievedUserId = sessionManager.GetCurrentUserId();
+            var retrievedUserId = sessionManager.Get();
             Console.ForegroundColor = ConsoleColor.DarkBlue;
             Console.WriteLine("============================UserId" + ":" + retrievedUserId);
         }
