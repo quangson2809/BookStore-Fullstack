@@ -19,13 +19,14 @@ namespace bookstore.Server.Controllers
         [HttpPost("admin/addbook")]
         public async Task<IActionResult> AddBook([FromBody] AddBookRequest request)
         {
+            var status = await _bookService.AddBook(request);
             return Ok();
         }
 
         [HttpGet("bookdetail/{id}")]
         public async Task<IActionResult> GetBookDetail([FromRoute] int id) 
         {
-
+            var item = await _bookService.GetBookDetail(id);
             return Ok();
 
         }
