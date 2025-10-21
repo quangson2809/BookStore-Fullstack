@@ -18,7 +18,7 @@ namespace bookstore.Server.Repositories.Implementations
                 .Include(book => book.Author)
                 .Include(book => book.Publisher)
                 .ToListAsync();
-
+            
         }
 
     }

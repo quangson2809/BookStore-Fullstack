@@ -12,18 +12,20 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using bookstore.Server.SessionCookies;
 
 namespace bookstore.Server.Services.Implementations
-
 {
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
         private readonly SessionManager _sessionManager;
         private readonly AuthenticationCookieManager _authCookieManager;
-        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager)
+        private readonly ICartService _cartService;
+
+        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
         {
             _userRepository = userRepository;
             _sessionManager = sessionManager;
             _authCookieManager = authCookieManager;
+            _cartService = cartService;
         }
 
         public async Task<StatusResponse> AdminLoginAsync(AdminLoginRequest request)
@@ -75,7 +77,6 @@ namespace bookstore.Server.Services.Implementations
                 return new StatusResponse(false, "Sdt đã tồn tại");
             }
       
-
             User u = new User
             {
                 FirstName = request.FirstName,
@@ -92,6 +93,7 @@ namespace bookstore.Server.Services.Implementations
             await _authCookieManager.Set(user);
             await _sessionManager.Set(user);
 
+            await _cartService.CreateCart(user.UserId);
             return new StatusResponse(true, "đăng ký thành công");
         }
 
