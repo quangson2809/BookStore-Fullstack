@@ -27,9 +27,12 @@ namespace bookstore.Server.Repositories.Implementations
             });
         }
 
-        public async Task CreateNewCart(int userId)
+        public async Task CreateCart(int userId)
         {
-
+            await _table.AddAsync(new Cart
+            {
+                UserId = userId
+            });
         }
         public async Task<Cart> GetByIdAsync(int cardId)
         {
@@ -37,7 +40,9 @@ namespace bookstore.Server.Repositories.Implementations
                 .Include(c => c.CartDetails)
                 .ThenInclude(cd => cd.Book)
                 .FirstOrDefaultAsync(c => c.CartId == cardId);
+
             return cart;
+
         }
         public async Task<int> GetCartIdByUserId(int userId)
         {
@@ -58,6 +63,7 @@ namespace bookstore.Server.Repositories.Implementations
             var cartDetai = cart.CartDetails.FirstOrDefault(cd => cd.BookId == bookId);
 
             cart.CartDetails.Remove(cartDetai);
+            await _dbContext.SaveChangesAsync();
         }
 
     }

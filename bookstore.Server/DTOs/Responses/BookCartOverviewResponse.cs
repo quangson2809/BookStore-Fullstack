@@ -18,7 +18,7 @@ namespace bookstore.Server.DTOs.Responses
             this.AuthorName = cartDetail.Book.Author;
             this.SalePrice = (int)cartDetail.Book.SalePrice;
             this.Quantity = cartDetail.Quantity;
-            this.TotalAmount = (int)cartDetail.TotalAmount;
+            this.TotalAmount = SalePrice * Quantity;
         }
     }
 }

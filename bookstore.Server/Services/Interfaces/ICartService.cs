@@ -9,5 +9,6 @@ namespace bookstore.Server.Services.Interfaces
         Task<DetailCartResponse> GetDetailCart();
         Task UpdateCart(List<CartItemUpdateRequest> request);
         Task<StatusResponse> RemoveBookFromCart(int BookId);
+        Task CreateCartForUser(int UserId);
     }
 }

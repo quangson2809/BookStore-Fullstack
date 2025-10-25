@@ -36,7 +36,7 @@ namespace bookstore.Server.SessionCookies
                 throw new Exception("Không có thông tin từ request");
             }
             httpContext.Session.SetInt32("UserId", user.UserId);
-            Console.WriteLine("============================Set" + ":" + user.UserId);
+            Console.WriteLine("============================SetUserId" + ":" + user.UserId);
         }
 
         public void Clear()

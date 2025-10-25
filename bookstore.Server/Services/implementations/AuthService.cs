@@ -29,9 +29,7 @@ namespace bookstore.Server.Services.Implementations
         }
 
         public async Task<StatusResponse> AdminLoginAsync(AdminLoginRequest request)
-
         {   
-            
             // Giả lập: chỉ cho phép "Admin" / "adminpass"
             User user = await _userRepository.GetByFirstName(request.Username);
             if (user == null)
@@ -45,6 +43,8 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
+                //
+                //int userId = _sessionManager.GetUserId();
                 return new StatusResponse(true, "Đăng nhập thành công");
             }
 
@@ -56,7 +56,6 @@ namespace bookstore.Server.Services.Implementations
             if (user == null)
             {
                 return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
-
             }
 
             if (request.Password == user.PasswordHash)
@@ -65,6 +64,8 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
+                //
+                int userId = _sessionManager.GetUserId();
                 return new StatusResponse(true, "Đăng nhập thành công");
             }
 

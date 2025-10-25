@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class GenericRepository<E> : IGenericRepository<E> where E : class
 {
-    private readonly BookStoreDbContext _dbContext;
+    protected readonly BookStoreDbContext _dbContext;
     protected readonly DbSet<E> _table;
 
     public GenericRepository(BookStoreDbContext dbContext) {

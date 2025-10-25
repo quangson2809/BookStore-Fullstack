@@ -5,7 +5,7 @@ namespace bookstore.Server.Repositories.Interfaces
     public interface ICartRepository : IGenericRepository<Cart>
     {
         Task AddBookToCart(int cartId,int Quantity, Book book);
-        Task CreateNewCart(int userId);
+        Task CreateCart(int userId);
         Task <int> GetCartIdByUserId(int userId);
         Task RemoveBookFromCart(int cartId, int bookId);
     }

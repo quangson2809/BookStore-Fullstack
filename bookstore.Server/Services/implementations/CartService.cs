@@ -82,12 +82,16 @@ namespace bookstore.Server.Services.implementations
                     BookId = item.BookId,
                     Quantity = item.Quantity,
                     CartId = (int)_currentCartId,
-                    TotalAmount = book.SalePrice * item.Quantity
                 };
                 cart.CartDetails.Add(cartDetail);
             }
 
             await _cartRepository.UpdateAsync(cart);
+        }
+
+        Task ICartService.CreateCartForUser(int UserId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
