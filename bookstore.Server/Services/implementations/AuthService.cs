@@ -28,7 +28,8 @@ namespace bookstore.Server.Services.Implementations
             _cartService = cartService;
         }
 
-        public async Task<StatusResponse> AdminLoginAsync(AdminLoginRequest request)
+        public async Task<StatusResponse> AdminLogin(AdminLoginRequest request)
+
         {   
             // Giả lập: chỉ cho phép "Admin" / "adminpass"
             User user = await _userRepository.GetByFirstName(request.Username);
@@ -50,7 +51,7 @@ namespace bookstore.Server.Services.Implementations
 
             return new StatusResponse(false, "Tên đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task <StatusResponse> CustomerLoginAsync(CustomerLoginRequest request)    
+        public async Task <StatusResponse> CustomerLogin(CustomerLoginRequest request)    
         {
             User user = await _userRepository.GetByPhone(request.PhoneNumber);
             if (user == null)
@@ -71,7 +72,7 @@ namespace bookstore.Server.Services.Implementations
 
             return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task<StatusResponse> CustomerSignupAsync(CustomerSignupRequest request) {
+        public async Task<StatusResponse> CustomerSignup(CustomerSignupRequest request) {
             User temp = await _userRepository.GetByPhone(request.PhoneNumber);
             if (temp != null )
             {

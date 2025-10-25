@@ -16,6 +16,12 @@ namespace bookstore.Server.Services.implementations
         {
             _bookRespository = bookRepository;
         }
+
+        public Task<StatusResponse> AddBook(AddBookRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         // Implement book-related methods here
         public async Task<StatusResponse> DeleteBook(int Id)
         {
@@ -35,8 +41,9 @@ namespace bookstore.Server.Services.implementations
 
         public async Task<BookDetailResponse> GetBookDetail(int Id)
         {
-            throw new NotImplementedException("chưa được thực thi");
-
+            throw new NotImplementedException("not implement");
         }
+
+        
     }
 }
