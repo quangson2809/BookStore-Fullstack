@@ -93,7 +93,6 @@ namespace bookstore.Server.Services.Implementations
             await _authCookieManager.Set(user);
             await _sessionManager.Set(user);
 
-            await _cartService.CreateCart(user.UserId);
             return new StatusResponse(true, "đăng ký thành công");
         }
 

@@ -12,6 +12,7 @@ public partial class Order
     public int? UserId { get; set; }
 
     public int? PaymentId { get; set; }
+    public DateTime? CreateTime { get; set; }
 
     public virtual ICollection<OrdersDetail> OrdersDetails { get; set; } = new List<OrdersDetail>();
 

@@ -1,4 +1,5 @@
-﻿using bookstore.Server.Services.Interfaces;
+﻿using bookstore.Server.DTOs.Requests;
+using bookstore.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 
@@ -15,19 +16,20 @@ namespace bookstore.Server.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("detailcart")]
+        [HttpGet("cart")]
         public async Task<IActionResult> GetCart()
         {
-            return Ok();
+            var cartDetail = await _cartService.GetDetailCart();
+            return Ok(cartDetail);
         }
 
-        [HttpPut("update/{Id}")]
-        public async Task<IActionResult> UpdateCart([FromBody]int Quantity, [FromRoute] int Id)
+        [HttpPut("updating")]
+        public async Task<IActionResult> UpdateCart([FromBody] List<CartItemUpdateRequest> request)
         {
             return Ok();
         }
 
-        [HttpPost("addbook/{Id}")]
+        [HttpPost("adding/{Id}")]
         public async Task<IActionResult> AddBookToCart([FromBody] int Quantity, [FromRoute] int Id)
         {
             await _cartService.AddBookToCard(Quantity, Id);

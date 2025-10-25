@@ -7,7 +7,7 @@ namespace bookstore.Server.DTOs.Responses
         public string BookName { get; set; }
         public string AuthorName { get; set; }
         public string PublisherName { get; set; }
-        public decimal SalePrice { get; set; }
+        public int SalePrice { get; set; }
         public int StockQuantity { get; set; }
         public string Language { get; set; }
 
@@ -20,9 +20,9 @@ namespace bookstore.Server.DTOs.Responses
                 }
             }
             BookName = book.BookName;
-            AuthorName = book.Author.AuthorName;
-            PublisherName = book.Publisher.PublisherName;
-            SalePrice = (decimal)book.SalePrice;
+            AuthorName = book.Author;
+            PublisherName = book.Publisher;
+            SalePrice = (int)book.SalePrice;
             StockQuantity = (int)book.StockQuantity;
             Language = book.Language;
         }

@@ -5,10 +5,9 @@ namespace bookstore.Server.Services.Interfaces
 {
     public interface ICartService
     {
-        Task<StatusResponse> CreateCart(int Id);
         Task<StatusResponse> AddBookToCard(int Quantity, int BookId);
         Task<DetailCartResponse> GetDetailCart();
-        Task ChangedQuantity();
-        Task LoadPrice();
+        Task UpdateCart(List<CartItemUpdateRequest> request);
+        Task<StatusResponse> RemoveBookFromCart(int BookId);
     }
 }

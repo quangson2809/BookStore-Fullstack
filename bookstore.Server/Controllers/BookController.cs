@@ -11,29 +11,30 @@ namespace bookstore.Server.Controllers
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
-        public BookController(IBookService bookService) {
+        public BookController(IBookService bookService)
+        {
             _bookService = bookService;
         }
 
-        [Authorize(Roles ="Admin")]                
+        [Authorize(Roles = "Admin")]
         [HttpPost("admin/addbook")]
         public async Task<IActionResult> AddBook([FromBody] AddBookRequest request)
         {
             return Ok();
         }
 
-        [HttpGet("bookdetail/{id}")]
-        public async Task<IActionResult> GetBookDetail([FromRoute] int id) 
+        [HttpGet("book/{id}")]
+        public async Task<IActionResult> GetBookDetail([FromRoute] int id)
         {
 
             return Ok();
 
         }
 
-        [HttpGet("allbook")]
+        [HttpGet("books")]
         public async Task<IActionResult> GetAllBook()
         {
-            var items =await _bookService.GetAllBook();
+            var items = await _bookService.GetAllBook();
             return Ok(items);
         }
 
@@ -41,6 +42,18 @@ namespace bookstore.Server.Controllers
         public async Task SearchBook<IActionResult>([FromBody] BookSearchRequest request)
         {
 
+        }
+
+        [HttpDelete("delele/{Id}")]
+        public async Task<IActionResult> DeleteBook([FromRoute] int Id)
+        {
+            var result = await _bookService.DeleteBook(Id);
+            return Ok(result);
+        }
+        [HttpPut("update/{Id}")]
+        public async Task<IActionResult> UpdateBook([FromRoute] int Id, [FromBody] UpdateBookRequest request)
+        {
+            return Ok();
         }
 
     }

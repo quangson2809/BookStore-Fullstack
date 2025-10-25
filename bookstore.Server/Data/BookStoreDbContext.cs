@@ -17,8 +17,6 @@ public partial class BookStoreDbContext : DbContext
     }
     
 
-    public virtual DbSet<Author> Authors { get; set; }
-
     public virtual DbSet<Book> Books { get; set; }
 
     public virtual DbSet<BookImage> BookImages { get; set; }
@@ -35,8 +33,6 @@ public partial class BookStoreDbContext : DbContext
 
     public virtual DbSet<Payment> Payments { get; set; }
 
-    public virtual DbSet<Publisher> Publishers { get; set; }
-
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -44,17 +40,6 @@ public partial class BookStoreDbContext : DbContext
    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Author>(entity =>
-        {
-            entity.HasKey(e => e.AuthorId).HasName("PK__Author__55B9F6BF32DFCA59");
-
-            entity.ToTable("Author");
-
-            entity.Property(e => e.AuthorId).HasColumnName("Author_Id");
-            entity.Property(e => e.AuthorName)
-                .HasMaxLength(150)
-                .HasColumnName("Author_Name");
-        });
 
         modelBuilder.Entity<Book>(entity =>
         {
@@ -65,13 +50,10 @@ public partial class BookStoreDbContext : DbContext
             entity.HasIndex(e => e.Isbn, "UQ__Book__447D36EA3043CB21").IsUnique();
 
             entity.Property(e => e.BookId).HasColumnName("Book_Id");
-            entity.Property(e => e.AuthorId).HasColumnName("Author_Id");
             entity.Property(e => e.BookName)
                 .HasMaxLength(200)
                 .HasColumnName("Book_Name");
-            entity.Property(e => e.BookStatus)
-                .HasMaxLength(50)
-                .HasColumnName("Book_Status");
+      
             entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
             entity.Property(e => e.Isbn)
                 .HasMaxLength(20)
@@ -81,7 +63,6 @@ public partial class BookStoreDbContext : DbContext
                 .HasColumnName("Original_price");
             entity.Property(e => e.PageNumber).HasColumnName("Page_number");
             entity.Property(e => e.PublishTime).HasColumnName("Publish_Time");
-            entity.Property(e => e.PublisherId).HasColumnName("Publisher_Id");
             entity.Property(e => e.SalePrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("Sale_price");
@@ -89,17 +70,12 @@ public partial class BookStoreDbContext : DbContext
                 .HasDefaultValue(0)
                 .HasColumnName("Stock_Quantity");
 
-            entity.HasOne(d => d.Author).WithMany(p => p.Books)
-                .HasForeignKey(d => d.AuthorId)
-                .HasConstraintName("FK__Book__Author_Id__300424B4");
+            
 
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK__Book__Category_I__2E1BDC42");
 
-            entity.HasOne(d => d.Publisher).WithMany(p => p.Books)
-                .HasForeignKey(d => d.PublisherId)
-                .HasConstraintName("FK__Book__Publisher___2F10007B");
         });
 
         modelBuilder.Entity<BookImage>(entity =>
@@ -229,20 +205,6 @@ public partial class BookStoreDbContext : DbContext
             entity.Property(e => e.MethodName)
                 .HasMaxLength(100)
                 .HasColumnName("Method_Name");
-        });
-
-        modelBuilder.Entity<Publisher>(entity =>
-        {
-            entity.HasKey(e => e.PublisherId).HasName("PK__Publishe__F9F45A44F669CACA");
-
-            entity.ToTable("Publisher");
-
-            entity.HasIndex(e => e.PublisherName, "UQ__Publishe__D198AC377E8A0869").IsUnique();
-
-            entity.Property(e => e.PublisherId).HasColumnName("Publisher_Id");
-            entity.Property(e => e.PublisherName)
-                .HasMaxLength(150)
-                .HasColumnName("Publisher_Name");
         });
 
         modelBuilder.Entity<Role>(entity =>

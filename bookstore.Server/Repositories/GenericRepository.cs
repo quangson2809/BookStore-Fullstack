@@ -22,22 +22,25 @@ public class GenericRepository<E> : IGenericRepository<E> where E : class
 
     public async Task DeleteAsync(int id)
     {
-         await Task.CompletedTask;
+          await _table
+            .Where(e => EF.Property<int>(e, "Id") == id)
+            .ExecuteDeleteAsync();
     }
 
     public async Task<IEnumerable<E>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _table.ToListAsync();
     }
 
     public async Task AddAsync(E entity)
     {
-        throw new NotImplementedException();
+        await _table.AddAsync(entity);
     }
 
-    public Task UpdateAsync(E entity)
+    public async Task UpdateAsync(E entity)
     {
-        throw new NotImplementedException();
+         _table.Update(entity);
+        await _dbContext.SaveChangesAsync();
     }
 }
 

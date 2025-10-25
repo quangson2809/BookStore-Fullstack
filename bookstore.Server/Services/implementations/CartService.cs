@@ -6,6 +6,7 @@ using bookstore.Server.Entities;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
 using bookstore.Server.SessionCookies;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace bookstore.Server.Services.implementations
 {
@@ -14,13 +15,16 @@ namespace bookstore.Server.Services.implementations
         private readonly ICartRepository _cartRepository;
         private readonly SessionManager  _sessionManager;
         private readonly IBookRepository _bookRepository;
+
+        private int? _currentCartId;
+
         public CartService(ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository)
         {
             _sessionManager = sessionManager;
             _cartRepository = cartRepository;
             _bookRepository = bookRepository ;
         }
-        // Implement cart-  related methods here
+
         public async Task<StatusResponse> AddBookToCard(int Quantity, int BookId)
         {
             Book book = await _bookRepository.GetByIdAsync(BookId);
@@ -29,31 +33,61 @@ namespace bookstore.Server.Services.implementations
                 return new StatusResponse(false, "Book not found or insufficient stock.");
             }
 
-            int userId =  _sessionManager.GetUserId();
-            var cartId = await _cartRepository.GetCartIdByUserId(userId);
-            await _cartRepository.AddBookToCart(cartId, Quantity, book);
+            if ( _currentCartId == null)
+            {
+                int userId = _sessionManager.GetUserId();
+                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
+            }
+           
+            await _cartRepository.AddBookToCart((int)_currentCartId, Quantity, book);
             return new StatusResponse(false, "đã thêm");
-
         }
 
-        public Task ChangedQuantity()
+        public async Task<DetailCartResponse> GetDetailCart()
         {
-            throw new NotImplementedException();
+            if (_currentCartId == null)
+            {
+                int userId = _sessionManager.GetUserId();
+                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
+            }
+
+            Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
+            DetailCartResponse detailCartResponse = new DetailCartResponse(cart);
+           
+            return detailCartResponse;
         }
 
-        public Task<StatusResponse> CreateCart(int id)
+        public async Task<StatusResponse> RemoveBookFromCart(int bookId)
         {
-            throw new NotImplementedException();
+            if (_currentCartId == null)
+            {
+                int userId = _sessionManager.GetUserId();
+                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
+            }
+
+            await _cartRepository.RemoveBookFromCart((int)_currentCartId, bookId);
+            return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
         }
 
-        public Task<DetailCartResponse> GetDetailCart()
+        public async Task UpdateCart(List<CartItemUpdateRequest> request)
         {
-            throw new NotImplementedException();
-        }
+            Cart cart = new Cart();
+            cart.CartDetails = new List<CartDetail>();
 
-        public Task LoadPrice()
-        {
-            throw new NotImplementedException();
+            foreach (CartItemUpdateRequest item in request)
+            {
+                Book book = await _bookRepository.GetByIdAsync(item.BookId);
+                CartDetail cartDetail = new CartDetail
+                {
+                    BookId = item.BookId,
+                    Quantity = item.Quantity,
+                    CartId = (int)_currentCartId,
+                    TotalAmount = book.SalePrice * item.Quantity
+                };
+                cart.CartDetails.Add(cartDetail);
+            }
+
+            await _cartRepository.UpdateAsync(cart);
         }
     }
 }
