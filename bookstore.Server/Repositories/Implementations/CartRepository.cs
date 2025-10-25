@@ -34,6 +34,7 @@ namespace bookstore.Server.Repositories.Implementations
                 UserId = userId
             });
         }
+        
         public async Task<Cart> GetByIdAsync(int cardId)
         {
             Cart cart = await _table
@@ -42,8 +43,8 @@ namespace bookstore.Server.Repositories.Implementations
                 .FirstOrDefaultAsync(c => c.CartId == cardId);
 
             return cart;
-
         }
+        
         public async Task<int> GetCartIdByUserId(int userId)
         {
             var cart = await _table
