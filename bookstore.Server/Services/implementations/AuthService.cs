@@ -12,24 +12,25 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using bookstore.Server.SessionCookies;
 
 namespace bookstore.Server.Services.Implementations
-
 {
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
         private readonly SessionManager _sessionManager;
         private readonly AuthenticationCookieManager _authCookieManager;
-        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager)
+        private readonly ICartService _cartService;
+
+        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
         {
             _userRepository = userRepository;
             _sessionManager = sessionManager;
             _authCookieManager = authCookieManager;
+            _cartService = cartService;
         }
 
         public async Task<StatusResponse> AdminLogin(AdminLoginRequest request)
 
         {   
-            
             // Giả lập: chỉ cho phép "Admin" / "adminpass"
             User user = await _userRepository.GetByFirstName(request.Username);
             if (user == null)
@@ -43,6 +44,8 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
+                //
+                //int userId = _sessionManager.GetUserId();
                 return new StatusResponse(true, "Đăng nhập thành công");
             }
 
@@ -54,7 +57,6 @@ namespace bookstore.Server.Services.Implementations
             if (user == null)
             {
                 return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
-
             }
 
             if (request.Password == user.PasswordHash)
@@ -63,6 +65,8 @@ namespace bookstore.Server.Services.Implementations
                 await _sessionManager.Set(user);
                 // Thiết lập cookie authentication
                 await _authCookieManager.Set(user);
+                //
+                int userId = _sessionManager.GetUserId();
                 return new StatusResponse(true, "Đăng nhập thành công");
             }
 
@@ -75,7 +79,6 @@ namespace bookstore.Server.Services.Implementations
                 return new StatusResponse(false, "Sdt đã tồn tại");
             }
       
-
             User u = new User
             {
                 FirstName = request.FirstName,

@@ -11,7 +11,8 @@ namespace bookstore.Server.SessionCookies
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public int Get()
+        public int GetUserId()
+
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null || httpContext.Session == null)
@@ -23,7 +24,7 @@ namespace bookstore.Server.SessionCookies
             {
                 throw new Exception("người dùng chưa đăng nhập hoặc session hết hạn");
             }
-            Console.WriteLine("============================Get" + ":" + userid.Value);
+            Console.WriteLine("============================GetUserId" + ":" + userid.Value);
             return userid.Value;
         }
 
@@ -35,7 +36,7 @@ namespace bookstore.Server.SessionCookies
                 throw new Exception("Không có thông tin từ request");
             }
             httpContext.Session.SetInt32("UserId", user.UserId);
-            Console.WriteLine("============================Set" + ":" + user.UserId);
+            Console.WriteLine("============================SetUserId" + ":" + user.UserId);
         }
 
         public void Clear()

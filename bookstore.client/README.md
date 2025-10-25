@@ -67,16 +67,8 @@ export default tseslint.config([
   },
 ])
 ```
-
-set ath: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-
-# apis
-post:
-http://localhost:5121/api/Auth/customer/login
-http://localhost:5121/api/Auth/admin/login
-http://localhost:5121/api/Auth/customer/signup
-
-get:
-http://localhost:5121/api/Book/allbook
-http://localhost:5121/api/Book/bookdetail/{id}
-
+-http://localhost:5121/api/Book/books
+-http://localhost:5121/api/Cart/cart
+-http://localhost:5121/api/Cart/cart
+-http://localhost:5121/api/Cart/adding/{Id}
+-http://localhost:5121/api/Cart/updating

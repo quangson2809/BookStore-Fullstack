@@ -15,10 +15,8 @@ namespace bookstore.Server.Repositories.Implementations
         {
              return await _table
                 .Include(book => book.BookImages)
-                .Include(book => book.Author)
-                .Include(book => book.Publisher)
                 .ToListAsync();
-
+            
         }
 
     }

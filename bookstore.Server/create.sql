@@ -1,98 +1,76 @@
-﻿
-------------------------------------------------------------
--- 2️⃣ XÓA TOÀN BỘ DỮ LIỆU
-------------------------------------------------------------
-DELETE FROM Book;
-DELETE FROM Author;
-DELETE FROM Publisher;
-DELETE FROM Category;
+﻿-- Dữ liệu mẫu cho bảng Role
+SET IDENTITY_INSERT [Role] ON;
+INSERT INTO Role (Role_id, Role_Name) VALUES (1, 'Admin');
+INSERT INTO Role (Role_id, Role_Name) VALUES (2, 'Customer');
+SET IDENTITY_INSERT [Role] OFF;
 
-------------------------------------------------------------
--- 3️⃣ RESET IDENTITY (ĐẢM BẢO ID CHẠY LẠI TỪ 1)
-------------------------------------------------------------
-DBCC CHECKIDENT ('Category', RESEED, 0);
-DBCC CHECKIDENT ('Publisher', RESEED, 0);
-DBCC CHECKIDENT ('Author', RESEED, 0);
-DBCC CHECKIDENT ('Book', RESEED, 0);
+-- Dữ liệu mẫu cho bảng User
+-- Chèn tài khoản Admin
+SET IDENTITY_INSERT [User] ON;
 
-------------------------------------------------------------
-------------------------------------------------------------
--- 5️⃣ INSERT DỮ LIỆU CATEGORY
-------------------------------------------------------------
-INSERT INTO Category (Category_Name)
+INSERT INTO [User] (User_id, First_Name, Last_Name, PasswordHash, Email, Phone, Create_Time, Address, Role_id)
+VALUES (
+    1,
+    N'admin',
+    N'system',
+    'admin123', -- Mật khẩu nên được hash trong thực tế
+    'admin@bookstore.com',
+    '0901234567',
+    GETDATE(),
+    N'123 Đường Quản Lý, Hà Nội',
+    1 -- Role_id = Admin
+);
+
+-- Chèn tài khoản Customer (Khách hàng)
+INSERT INTO [User] (User_id, First_Name, Last_Name, PasswordHash, Email, Phone, Create_Time, Address, Role_id)
+VALUES (
+    2,
+    N'Sẹo đời',
+    N'',
+    '123456', -- Mật khẩu nên được hash trong thực tế
+    'customerA@bookstore.com',
+    '0123456789',
+    GETDATE(),
+    N'456 Phố Mua Sắm, TP.HCM',
+    2 -- Role_id = Customer
+);
+SET IDENTITY_INSERT [User] off;
+
+SET IDENTITY_INSERT [Category] on;
+INSERT INTO Category (Category_id, Category_Name) VALUES (1, N'Khoa học');
+INSERT INTO Category (Category_id, Category_Name) VALUES (2, N'Văn học');
+INSERT INTO Category (Category_id, Category_Name) VALUES (3, N'Lập trình');
+SET IDENTITY_INSERT [Category] off;
+
+SET IDENTITY_INSERT [Book] on;
+INSERT INTO Book ( Book_Name, Original_price, Sale_price, Stock_Quantity, Publish_Time, ISBN, Language, Page_number, Category_id)
 VALUES
-('Văn học'),
-('Trinh thám - Huyền bí'),
-('Phát triển bản thân'),
-('Kinh tế - Kỹ năng sống'),
-('Fantasy'),
-('Tiểu thuyết lãng mạn'),
-('Tâm lý học'),
-('Thiếu nhi'),
-('Khoa học - Tri thức'),
-('Lịch sử - Văn hóa');
+( N'Sự Sống 3.0', 300000, 270000,  50, GETDATE(), '978-604-941-792-5', N'Tiếng Việt', 450, 1),
+(N'Vũ Trụ Trong Vỏ Hạt Dẻ', 250000, 225000,  30, GETDATE(), '978-055-380-539-7', N'Tiếng Anh', 280, 1),
+(N'Nhà Giả Kim', 120000, 108000,  100, GETDATE(), '978-604-585-177-8', N'Tiếng Việt', 240, 2),
+( N'Rừng Na Uy', 150000, 135000,  75, GETDATE(), '978-009-944-898-2', N'Tiếng Anh', 400, 2),
+(N'Code Complete', 800000, 750000, 20, GETDATE(), '978-073-561-967-8', N'Tiếng Anh', 960, 3),
+( N'Clean Code', 650000, 600000,  40, GETDATE(), '978-013-235-088-4', N'Tiếng Anh', 464, 3),
+(N'Lược Sử Loài Người', 280000, 252000,  60, GETDATE(), '978-604-561-267-8', N'Tiếng Việt', 500, 1),
+( N'Đắc Nhân Tâm', 99000, 89000,  120, GETDATE(), '978-604-001-234-5', N'Tiếng Việt', 300, 2),
+( N'Design Patterns', 700000, 650000,  15, GETDATE(), '978-020-163-361-0', N'Tiếng Anh', 395, 3),
+( N'Bắt Đầu Với SQL Server', 450000, 400000,  35, GETDATE(), '978-604-888-999-0', N'Tiếng Việt', 320, 3);
+SET IDENTITY_INSERT [Book] off;
 
-------------------------------------------------------------
--- 6️⃣ INSERT DỮ LIỆU PUBLISHER
-------------------------------------------------------------
-
-INSERT INTO Publisher (Publisher_Name)
+INSERT INTO Cart ( User_id) VALUES ( 2);
+INSERT INTO CartDetail (Cart_id, Book_id, Quantity, Total_amount)
 VALUES
-('Bloomsbury Publishing'),
-('HarperCollins'),
-('Doubleday'),
-('HarperOne'),
-('Penguin Random House'),
-('NXB Trẻ'),
-('NXB Tổng Hợp TP.HCM'),
-('NXB Kim Đồng'),
-('NXB Lao Động'),
-('NXB Văn Học');
+(1, 3, 2, 2 * 108000), -- 2 cuốn Nhà Giả Kim
+(1, 4, 1, 1 * 135000);  -- 1 cuốn Rừng Na Uy
 
-------------------------------------------------------------
--- 7️⃣ INSERT DỮ LIỆU AUTHOR
-------------------------------------------------------------
-INSERT INTO Author (Author_Name)
+INSERT INTO Orders ( User_id)
+VALUES (
+    -- Trạng thái đơn hàng
+    2
+  
+);
+
+INSERT INTO OrdersDetail (Order_id, Book_id, Quantity, Total_Price, Create_Time)
 VALUES
-('J.K. Rowling'),
-('J.R.R. Tolkien'),
-('Dan Brown'),
-('Paulo Coelho'),
-('James Clear'),
-('Nguyễn Nhật Ánh'),
-('Dale Carnegie'),
-('Rosie Nguyễn'),
-('Tony Buổi Sáng'),
-('Nguyễn Phong Việt');
-
-------------------------------------------------------------
--- 8️⃣ INSERT DỮ LIỆU BOOK
-------------------------------------------------------------
-INSERT INTO Book 
-(Book_Name, Original_price, Sale_price, Book_Status, Publish_Time, Stock_Quantity, ISBN, Page_number, Category_Id, Publisher_Id, Author_Id, Language)
-VALUES
--- Quốc tế
-('Harry Potter and the Philosopher''s Stone', 220000, 180000, 'Available', '1997-06-26', 300, '9780747532743', 223, 5, 1, 1, 'English'),
-('The Hobbit', 250000, 210000, 'Available', '1937-09-21', 200, '9780007458424', 310, 5, 2, 2, 'English'),
-('The Da Vinci Code', 270000, 230000, 'Available', '2003-03-18', 350, '9780385504201', 454, 2, 3, 3, 'English'),
-('The Alchemist', 180000, 150000, 'Available', '1988-04-15', 400, '9780061122415', 197, 1, 4, 4, 'English'),
-('Atomic Habits', 300000, 260000, 'Available', '2018-10-16', 500, '9780735211292', 320, 3, 5, 5, 'English'),
-
--- Việt Nam
-('Cho tôi xin một vé đi tuổi thơ', 95000, 75000, 'Available', '2008-05-15', 250, '9786042079638', 220, 8, 6, 6, 'Tiếng Việt'),
-('Tôi thấy hoa vàng trên cỏ xanh', 105000, 89000, 'Available', '2010-10-10', 280, '9786042079639', 350, 8, 6, 6, 'Tiếng Việt'),
-('Đắc Nhân Tâm', 120000, 99000, 'Available', '1936-01-01', 450, '9786049223034', 320, 3, 7, 7, 'Tiếng Việt'),
-('Tuổi trẻ đáng giá bao nhiêu', 130000, 115000, 'Available', '2016-06-01', 300, '9786046848681', 280, 4, 8, 8, 'Tiếng Việt'),
-('Trên đường băng', 110000, 95000, 'Available', '2017-09-10', 220, '9786047742650', 250, 4, 8, 9, 'Tiếng Việt');
-
--- ROLE
-INSERT INTO Role (Role_name) VALUES
-(N'Admin'),
-(N'Customer');
-
--- USER
-INSERT INTO [User] (First_name, Last_name,PasswordHash, Email, Phone, Address, Role_Id)
-VALUES
-(N'John', N'Doe', N'123456', N'john.doe@example.com', N'0123456789', N'123 Main St', 2),
-(N'Alice', N'Smith', N'123456', N'alice.smith@example.com', N'0987654321', N'456 High St', 2),
-(N'admin', N'system', N'admin123', N'admin@example.com', N'0111111111', N'Head Office', 1);
+(1, 1, 1, 270000, GETDATE()), -- Mua 1 cuốn Sách 1 (Sự Sống 3.0)
+(1, 5, 1, 750000, GETDATE()); -- Mua 1 cuốn Sách 5 (Code Complete)

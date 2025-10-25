@@ -1,6 +1,12 @@
-﻿namespace bookstore.Server.Repositories.Interfaces
+﻿using bookstore.Server.DTOs.Requests;
+using bookstore.Server.Entities;
+namespace bookstore.Server.Repositories.Interfaces
 {
-    public interface ICartRepository
+    public interface ICartRepository : IGenericRepository<Cart>
     {
+        Task AddBookToCart(int cartId,int Quantity, Book book);
+        Task CreateCart(int userId);
+        Task <int> GetCartIdByUserId(int userId);
+        Task RemoveBookFromCart(int cartId, int bookId);
     }
 }
