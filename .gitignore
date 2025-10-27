@@ -6,7 +6,6 @@ build/
 dist/
 .envs
 Models/
-obj/
 Properties/
 Views/
 wwwroot/
