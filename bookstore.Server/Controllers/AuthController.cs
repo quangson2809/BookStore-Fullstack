@@ -35,8 +35,8 @@ namespace bookstore.Server.Controllers
         [HttpPost("customer/signup")]
         public async Task<IActionResult> CustomerSignup([FromBody] CustomerSignupRequest request)
         {
-            var response = _authService.CustomerSignup(request);
-            return Ok();
+            var response = await _authService.CustomerSignup(request);
+            return Ok(response);
         }
 
         [Authorize(Roles ="Admin")]

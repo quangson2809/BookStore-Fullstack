@@ -14,7 +14,6 @@ namespace bookstore.Server.Repositories.Implementations
         public async Task Create(Book book)
         {
             await _table.AddAsync(book);
-             _dbContext.SaveChanges();
         }
 
         public async Task<IEnumerable<Book>> GetAllAsync()

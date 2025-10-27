@@ -1,5 +1,6 @@
 using bookstore.Server.DTOs.Requests;
 using bookstore.Server.DTOs.Responses;
+using bookstore.Server.Entities;
 
 namespace bookstore.Server.Services.Interfaces
 {
@@ -10,6 +11,6 @@ namespace bookstore.Server.Services.Interfaces
         Task UpdateCart(List<CartItemUpdateRequest> request);
         Task UpdateCart(int Quantity, int bookId);
         Task<StatusResponse> RemoveBookFromCart(int BookId);
-        Task CreateCartForUser(int UserId);
+        Task CreateCartForUser(Cart cart);
     }
 }

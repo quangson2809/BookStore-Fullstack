@@ -10,18 +10,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using bookstore.Server.SessionCookies;
+using bookstore.Server.Data;
 
 namespace bookstore.Server.Services.Implementations
 {
     public class AuthService : IAuthService
     {
+        private readonly BookStoreDbContext _dbContext;
         private readonly IUserRepository _userRepository;
         private readonly SessionManager _sessionManager;
         private readonly AuthenticationCookieManager _authCookieManager;
         private readonly ICartService _cartService;
 
-        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
+        public AuthService(BookStoreDbContext dbContext,IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
         {
+            _dbContext = dbContext;
             _userRepository = userRepository;
             _sessionManager = sessionManager;
             _authCookieManager = authCookieManager;
@@ -51,12 +54,12 @@ namespace bookstore.Server.Services.Implementations
 
             return new StatusResponse(false, "Tên đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task <StatusResponse> CustomerLogin(CustomerLoginRequest request)    
+        public async Task <CustomerLoginResponse> CustomerLogin(CustomerLoginRequest request)    
         {
             User user = await _userRepository.GetByPhone(request.PhoneNumber);
             if (user == null)
             {
-                return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
+                throw new Exception("SĐT đăng nhập hoặc mật khẩu không dúng");
             }
 
             if (request.Password == user.PasswordHash)
@@ -67,18 +70,28 @@ namespace bookstore.Server.Services.Implementations
                 await _authCookieManager.Set(user);
                 //
                 int userId = _sessionManager.GetUserId();
-                return new StatusResponse(true, "Đăng nhập thành công");
+                return new CustomerLoginResponse()
+                {
+                    UserId = user.UserId,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                };
             }
 
-            return new StatusResponse(false, "SĐT đăng nhập hoặc mật khẩu không dúng");
+            throw new Exception("SĐT đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task<StatusResponse> CustomerSignup(CustomerSignupRequest request) {
-            User temp = await _userRepository.GetByPhone(request.PhoneNumber);
-            if (temp != null )
+        public async Task<CustomerLoginResponse> CustomerSignup(CustomerSignupRequest request) {
+            if (await _userRepository.GetByPhone(request.PhoneNumber) != null )
             {
-                return new StatusResponse(false, "Sdt đã tồn tại");
+                throw new Exception("SĐT đã được đăng ký");
             }
-      
+            if(await _userRepository.GetByEmail(request.Email) != null)
+            {
+                throw new Exception("Email đã được đăng ký");
+
+            }
             User u = new User
             {
                 FirstName = request.FirstName,
@@ -86,16 +99,25 @@ namespace bookstore.Server.Services.Implementations
                 Email = request.Email,
                 Phone = request.PhoneNumber,
                 PasswordHash=request.Password,
-                Address=request.Address,
-                RoleId=1
+                RoleId=2
             };
+            Cart cart = new Cart
+            {
+                User = u
+            };
+            await _cartService.CreateCartForUser(cart);
             await _userRepository.AddAsync(u);
+            await _dbContext.SaveChangesAsync();
+            //u được Ef gán id sau khi save changes
+            //await _authCookieManager.Set(u);
+            //await _sessionManager.Set(u);
 
-            User user = await _userRepository.GetByPhone(request.PhoneNumber);
-            await _authCookieManager.Set(user);
-            await _sessionManager.Set(user);
-
-            return new StatusResponse(true, "đăng ký thành công");
+            return new CustomerLoginResponse() { 
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                Phone = u.Phone
+            };
         }
 
         

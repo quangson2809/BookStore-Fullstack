@@ -1,10 +1,11 @@
-﻿using bookstore.Server.DTOs.Requests;
+﻿using bookstore.Server.Data;
+using bookstore.Server.DTOs.Requests;
 using bookstore.Server.DTOs.Responses;
-using bookstore.Server.Services.Interfaces;
-using bookstore.Server.Repositories;
 using bookstore.Server.Entities;
+using bookstore.Server.Repositories;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
+using bookstore.Server.Services.Interfaces;
 using bookstore.Server.SessionCookies;
 using Microsoft.AspNetCore.Http.Features;
 
@@ -12,6 +13,7 @@ namespace bookstore.Server.Services.implementations
 {
     public class CartService : ICartService
     {
+        private readonly BookStoreDbContext _dbContext;
         private readonly ICartRepository _cartRepository;
         private readonly SessionManager  _sessionManager;
         private readonly IBookRepository _bookRepository;
@@ -19,8 +21,9 @@ namespace bookstore.Server.Services.implementations
 
         private int? _currentCartId;
 
-        public CartService(ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository, ICartDetailRepository cartDetailRepository)
+        public CartService(BookStoreDbContext dbContext ,ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository, ICartDetailRepository cartDetailRepository)
         {
+            _dbContext = dbContext;
             _sessionManager = sessionManager;
             _cartRepository = cartRepository;
             _bookRepository = bookRepository;
@@ -42,6 +45,7 @@ namespace bookstore.Server.Services.implementations
             }
            
             await _cartRepository.AddBookToCart((int)_currentCartId, Quantity, book);
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(false, "đã thêm");
         }
 
@@ -68,6 +72,7 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _cartRepository.RemoveBookFromCart((int)_currentCartId, bookId);
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
         }
 
@@ -89,16 +94,18 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _cartRepository.UpdateAsync(cart);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task UpdateCart(int Quantity, int bookId)
         {
             await _cartDetailRepository.UpdateCartDetail((int)_currentCartId, bookId, Quantity);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public async Task CreateCartForUser(int UserId)
+        public async Task CreateCartForUser(Cart cart)
         {
-            _cartRepository.CreateCart(UserId);
+            await _cartRepository.AddAsync( cart);
         }
     }
 }

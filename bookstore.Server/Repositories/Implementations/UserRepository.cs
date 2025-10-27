@@ -27,9 +27,12 @@ namespace bookstore.Server.Repositories.Implementations
             return user;
         }
 
-        public async Task AddAsync(User user)
+        public async Task<User?> GetByEmail(string email)
         {
-            await _table.AddAsync(user);
+            var user = await _table.Include(u => u.Role)
+               .FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return null;
+            return user;
         }
     }
 }

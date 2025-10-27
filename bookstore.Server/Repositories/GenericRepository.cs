@@ -40,7 +40,6 @@ public class GenericRepository<E> : IGenericRepository<E> where E : class
     public async Task UpdateAsync(E entity)
     {
         _table.Update(entity);
-        await _dbContext.SaveChangesAsync();
     }
 }
 
