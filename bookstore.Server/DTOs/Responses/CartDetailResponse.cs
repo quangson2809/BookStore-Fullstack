@@ -1,12 +1,12 @@
 ﻿using bookstore.Server.Entities;
 namespace bookstore.Server.DTOs.Responses
 {
-    public class DetailCartResponse
+    public class CartDetailResponse
     {
         public int TotalPrice { get; set; }
         public List<BookCartOverviewResponse> Items { get; set; }
         
-        public DetailCartResponse(Cart cart)
+        public CartDetailResponse(Cart cart)
         {
             Items = new List<BookCartOverviewResponse>();
             foreach (CartDetail cartDetail in cart.CartDetails)

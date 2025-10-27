@@ -23,23 +23,33 @@ namespace bookstore.Server.Controllers
             return Ok(cartDetail);
         }
 
-        [HttpPut("updating")]
+        [HttpPatch("updating")]
         public async Task<IActionResult> UpdateCart([FromBody] List<CartItemUpdateRequest> request)
         {
+            await _cartService.UpdateCart(request);
             return Ok();
         }
 
         [HttpPost("adding/{Id}")]
-        public async Task<IActionResult> AddBookToCart([FromBody] int Quantity, [FromRoute] int Id)
+        public async Task<IActionResult> AddBookToCart([FromBody] CartItemAddRequest request, [FromRoute] int Id)
         {
-            await _cartService.AddBookToCard(Quantity, Id);
+            await _cartService.AddBookToCard(request.Quantity, Id);
             return Ok();
         }
 
+        [HttpDelete("deleting/{Id}")]
+        public async Task <IActionResult> RemoveBookFromCart([FromRoute] int Id)
+        {
+            var response = await _cartService.RemoveBookFromCart(Id);
+            return Ok(response);
+        }
 
-        
-        
-
-
+        [HttpPatch("updating-item/{Id}")]
+        public async Task<IActionResult> UpdateItem([FromBody] CartItemUpdateRequest request, [FromRoute] int Id)
+        {
+            await _cartService.AddBookToCard(request.Quantity, Id);
+            return Ok();
+        }
+       
     }
 }
