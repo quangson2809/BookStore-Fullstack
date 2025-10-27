@@ -68,7 +68,23 @@ export default tseslint.config([
 ])
 ```
 -http://localhost:5121/api/Book/books
--http://localhost:5121/api/Cart/cart
+-http://localhost:5121/api/book/creating
+-http://localhost:5121/api/Book/book/{Id}
+-http://localhost:5121/api/book/updating
+
 -http://localhost:5121/api/Cart/cart
 -http://localhost:5121/api/Cart/adding/{Id}
 -http://localhost:5121/api/Cart/updating
+-http://localhost:5121/api/cart/updating-item/{Id}
+-http://localhost:5121/api/cart/deleting/{Id}
+
+test post: 
+curl -X POST http://localhost:5121/api/Auth/Customer/login ^
+More?      -H "Content-Type: application/json" ^
+More?      -d "{\"PhoneNumber\":\"0123456789\", \"Password\":\"123456\"}"
+
+curl -X POST http://localhost:5121/api/Auth/Admin/login ^
+More?      -H "Content-Type: application/json" ^
+More?      -d "{\"UserName\":\"admin\", \"Password\":\"admin123\"}"
+
+curl -X POST http://localhost:5121/

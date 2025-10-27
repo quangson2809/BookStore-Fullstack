@@ -15,14 +15,16 @@ namespace bookstore.Server.Services.implementations
         private readonly ICartRepository _cartRepository;
         private readonly SessionManager  _sessionManager;
         private readonly IBookRepository _bookRepository;
+        private readonly ICartDetailRepository _cartDetailRepository;
 
         private int? _currentCartId;
 
-        public CartService(ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository)
+        public CartService(ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository, ICartDetailRepository cartDetailRepository)
         {
             _sessionManager = sessionManager;
             _cartRepository = cartRepository;
-            _bookRepository = bookRepository ;
+            _bookRepository = bookRepository;
+            _cartDetailRepository = cartDetailRepository;
         }
 
         public async Task<StatusResponse> AddBookToCard(int Quantity, int BookId)
@@ -43,7 +45,7 @@ namespace bookstore.Server.Services.implementations
             return new StatusResponse(false, "đã thêm");
         }
 
-        public async Task<DetailCartResponse> GetDetailCart()
+        public async Task<CartDetailResponse> GetDetailCart()
         {
             if (_currentCartId == null)
             {
@@ -52,7 +54,7 @@ namespace bookstore.Server.Services.implementations
             }
 
             Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
-            DetailCartResponse detailCartResponse = new DetailCartResponse(cart);
+            CartDetailResponse detailCartResponse = new CartDetailResponse(cart);
            
             return detailCartResponse;
         }
@@ -71,7 +73,7 @@ namespace bookstore.Server.Services.implementations
 
         public async Task UpdateCart(List<CartItemUpdateRequest> request)
         {
-            Cart cart = new Cart();
+            Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
             cart.CartDetails = new List<CartDetail>();
 
             foreach (CartItemUpdateRequest item in request)
@@ -89,9 +91,14 @@ namespace bookstore.Server.Services.implementations
             await _cartRepository.UpdateAsync(cart);
         }
 
-        Task ICartService.CreateCartForUser(int UserId)
+        public async Task UpdateCart(int Quantity, int bookId)
         {
-            throw new NotImplementedException();
+            await _cartDetailRepository.UpdateCartDetail((int)_currentCartId, bookId, Quantity);
+        }
+
+        public async Task CreateCartForUser(int UserId)
+        {
+            _cartRepository.CreateCart(UserId);
         }
     }
 }

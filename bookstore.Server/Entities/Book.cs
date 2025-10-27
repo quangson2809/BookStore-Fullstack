@@ -11,7 +11,7 @@ public partial class Book
     public string BookName { get; set; } = null!;
     public decimal OriginalPrice { get; set; }
     public decimal? SalePrice { get; set; }
-    public DateOnly? PublishTime { get; set; }
+    public DateTime PublishTime { get; set; }
     public int? StockQuantity { get; set; }
     public string? Isbn { get; set; }
     public string? Language {  get; set; }

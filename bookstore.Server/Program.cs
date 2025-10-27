@@ -55,12 +55,12 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SessionManager>();
 builder.Services.AddScoped<AuthenticationCookieManager>();
 
-
 // đăng ký Repositoryies
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartDetailRepository, CartDetailRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Đăng ký services
