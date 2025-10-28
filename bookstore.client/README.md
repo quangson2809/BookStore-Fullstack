@@ -68,9 +68,11 @@ export default tseslint.config([
 ])
 ```
 -http://localhost:5121/api/Book/books
--http://localhost:5121/api/book/creating
+-http://localhost:5121/api/book/adding
 -http://localhost:5121/api/Book/book/{Id}
+-http://localhost:5121/api/Book/delete/{Id}
 -http://localhost:5121/api/book/updating
+
 
 -http://localhost:5121/api/Cart/cart
 -http://localhost:5121/api/Cart/adding/{Id}
@@ -87,4 +89,19 @@ curl -X POST http://localhost:5121/api/Auth/Admin/login ^
 More?      -H "Content-Type: application/json" ^
 More?      -d "{\"UserName\":\"admin\", \"Password\":\"admin123\"}"
 
-curl -X POST http://localhost:5121/
+curl -X POST "http://localhost:5121/api/Auth/Customer/signup" 
+-H "Content-Type: application/json"
+-d "{\"firstName\":\"Son\",\"lastName\":\"Dang\",\"phoneNumber\":\"280925\",
+\"password\":\"son\",\"address\":\"Ha Noi\",\"email\":\"dui@example.com\"}"
+
+curl -X PATCH "http://localhost:5121/api/book/updating"
+-H "Content-Type: application/json" 
+-d "{\"id\":1,\"imageUrls\":[\"url1.jpg\",\"url2.jpg\"],\"name\":\"Sách mới\",\"isbn\":\"9781234567890\",
+\"author\":\"Nguyễn Văn A\",\"publisher\":\"NXB Trẻ\",\"quantity\":100,\"salePrice\":90000,\"originalPrice\":120000,
+\"pageNumber\":300,\"publishTime\":\"2024-05-01T00:00:00\",\"categoryId\":2,\"language\":\"Tiếng Việt\"}"
+
+curl -X POST "http://localhost:5121/api/book/adding"
+-H "Content-Type: application/json"
+-d "{\"imageUrls\":[\"book1.jpg\",\"book2.jpg\"],\"name\":\"Lập trình C# nâng cao\",\"isbn\":\"9786041234567\",
+\"author\":\"Nguyễn Văn A\",\"publisher\":\"NXB Trẻ\",\"quantity\":50,\"salePrice\":120000,\"originalPrice\":150000,
+\"pageNumber\":350,\"publishTime\":\"2024-03-10T00:00:00\",\"categoryId\":3,\"language\":\"Tiếng Việt\"}"

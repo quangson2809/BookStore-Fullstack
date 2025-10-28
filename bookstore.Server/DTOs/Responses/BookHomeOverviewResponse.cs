@@ -3,12 +3,14 @@ namespace bookstore.Server.DTOs.Responses
 {
     public class BookHomeOverviewResponse
     {
+        public int Id { get; set; }
         public string ImageLink { get; set; }
-        public string BookName { get; set; }
-        public string AuthorName { get; set; }
-        public string PublisherName { get; set; }
+        public string Name { get; set; }
+        public string Author { get; set; }
+        public string Publisher { get; set; }
         public int SalePrice { get; set; }
-        public int StockQuantity { get; set; }
+        public int OriginalPrice { get; set; }
+        public int Quantity { get; set; }
         public string Language { get; set; }
 
         public BookHomeOverviewResponse(Book book) {
@@ -19,11 +21,13 @@ namespace bookstore.Server.DTOs.Responses
                     break;
                 }
             }
-            BookName = book.BookName;
-            AuthorName = book.Author;
-            PublisherName = book.Publisher;
+            Id = book.BookId;
+            Name = book.BookName;
+            Author = book.Author;
+            Publisher = book.Publisher;
             SalePrice = (int)book.SalePrice;
-            StockQuantity = (int)book.StockQuantity;
+            OriginalPrice = (int)book.OriginalPrice;
+            Quantity = (int)book.StockQuantity;
             Language = book.Language;
         }
 

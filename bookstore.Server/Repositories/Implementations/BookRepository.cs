@@ -23,6 +23,12 @@ namespace bookstore.Server.Repositories.Implementations
                 .ToListAsync();
             
         }
+        public async Task DeleteAsync(int id)
+        {
+            await _table
+                .Where(b => b.BookId == id)
+                .ExecuteDeleteAsync();
+        }
 
         public async Task<Book> GetByIdAsync(int bookId)
         {
@@ -48,7 +54,6 @@ namespace bookstore.Server.Repositories.Implementations
                     .SetProperty(bk => bk.PublishTime, book.PublishTime)
                     .SetProperty(bk => bk.CategoryId, book.CategoryId)
                     .SetProperty(bk => bk.Language, book.Language)
-                    .SetProperty(bk => bk.BookImages, book.BookImages)
                 );
         }
     }

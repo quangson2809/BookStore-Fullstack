@@ -39,7 +39,7 @@ namespace bookstore.Server.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         [HttpPost("admin/dashboard")]
         public async Task<IActionResult> AccessDashboad()
         {

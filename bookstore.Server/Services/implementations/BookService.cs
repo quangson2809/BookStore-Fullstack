@@ -105,7 +105,7 @@ namespace bookstore.Server.Services.implementations
                 });
             }
             await _bookRespository.UpdateAsync(book);
-            
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Cập nhật sách thành công");
 
         }

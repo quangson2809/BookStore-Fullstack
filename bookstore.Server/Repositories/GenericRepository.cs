@@ -23,7 +23,7 @@ public class GenericRepository<E> : IGenericRepository<E> where E : class
     public async Task DeleteAsync(int id)
     {
           await _table
-            .Where(e => EF.Property<int>(e, "Id") == id)
+            .Where(e => EF.Property<int>(e, "BookId") == id)
             .ExecuteDeleteAsync();
     }
 

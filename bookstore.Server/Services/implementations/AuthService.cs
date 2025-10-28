@@ -35,7 +35,7 @@ namespace bookstore.Server.Services.Implementations
 
         {   
             // Giả lập: chỉ cho phép "Admin" / "adminpass"
-            User user = await _userRepository.GetByFirstName(request.Username);
+            User user = await _userRepository.GetByFirstName(request.UserName);
             if (user == null)
             {
                 return new StatusResponse(false, "Tên đăng nhập hoặc mật khẩu không dúng");
@@ -82,7 +82,7 @@ namespace bookstore.Server.Services.Implementations
 
             throw new Exception("SĐT đăng nhập hoặc mật khẩu không dúng");
         }
-        public async Task<CustomerLoginResponse> CustomerSignup(CustomerSignupRequest request) {
+        public async Task<StatusResponse> CustomerSignup(CustomerSignupRequest request) {
             if (await _userRepository.GetByPhone(request.PhoneNumber) != null )
             {
                 throw new Exception("SĐT đã được đăng ký");
@@ -112,12 +112,12 @@ namespace bookstore.Server.Services.Implementations
             //await _authCookieManager.Set(u);
             //await _sessionManager.Set(u);
 
-            return new CustomerLoginResponse() { 
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                Phone = u.Phone
+            return new StatusResponse()
+            {
+                Success = true,
+                Message = "Đăng ký thành công"
             };
+
         }
 
         
