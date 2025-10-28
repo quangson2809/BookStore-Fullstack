@@ -6,15 +6,18 @@ using bookstore.Server.Entities;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
+using bookstore.Server.Data;
 
 namespace bookstore.Server.Services.implementations
 {
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRespository;
-        public BookService(IBookRepository bookRepository)
+        private readonly BookStoreDbContext _dbContext;
+        public BookService(BookStoreDbContext dbContext, IBookRepository bookRepository)
         {
             _bookRespository = bookRepository;
+            _dbContext = dbContext;
         }
 
         public async Task<StatusResponse> AddBook(BookAddRequest request)
@@ -43,6 +46,7 @@ namespace bookstore.Server.Services.implementations
                 }
 
             await _bookRespository.Create(book);
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Đã thêm sách mới");
         }
 
@@ -50,6 +54,7 @@ namespace bookstore.Server.Services.implementations
         public async Task<StatusResponse> DeleteBook(int bookId)
         {
             await _bookRespository.DeleteAsync(bookId);
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Đã xoá sách");
         }
 
@@ -79,8 +84,7 @@ namespace bookstore.Server.Services.implementations
         {
             Book book = new Book()
             {
-               
-                BookId = request.Id,
+                               BookId = request.Id,
                 BookName = request.Name,
                 Isbn = request.ISBN,
                 Author = request.Author,
@@ -101,7 +105,7 @@ namespace bookstore.Server.Services.implementations
                 });
             }
             await _bookRespository.UpdateAsync(book);
-            
+            await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Cập nhật sách thành công");
 
         }

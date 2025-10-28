@@ -62,9 +62,7 @@ namespace bookstore.Server.Repositories.Implementations
                 .FirstOrDefaultAsync(c => c.CartId == cartId);
 
             var cartDetai = cart.CartDetails.FirstOrDefault(cd => cd.BookId == bookId);
-
             cart.CartDetails.Remove(cartDetai);
-            await _dbContext.SaveChangesAsync();
         }
 
     }

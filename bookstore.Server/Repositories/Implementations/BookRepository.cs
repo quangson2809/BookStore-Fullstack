@@ -14,7 +14,6 @@ namespace bookstore.Server.Repositories.Implementations
         public async Task Create(Book book)
         {
             await _table.AddAsync(book);
-             _dbContext.SaveChanges();
         }
 
         public async Task<IEnumerable<Book>> GetAllAsync()
@@ -23,6 +22,12 @@ namespace bookstore.Server.Repositories.Implementations
                 .Include(book => book.BookImages)
                 .ToListAsync();
             
+        }
+        public async Task DeleteAsync(int id)
+        {
+            await _table
+                .Where(b => b.BookId == id)
+                .ExecuteDeleteAsync();
         }
 
         public async Task<Book> GetByIdAsync(int bookId)
@@ -49,7 +54,6 @@ namespace bookstore.Server.Repositories.Implementations
                     .SetProperty(bk => bk.PublishTime, book.PublishTime)
                     .SetProperty(bk => bk.CategoryId, book.CategoryId)
                     .SetProperty(bk => bk.Language, book.Language)
-                    .SetProperty(bk => bk.BookImages, book.BookImages)
                 );
         }
     }

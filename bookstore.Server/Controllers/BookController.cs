@@ -17,7 +17,7 @@ namespace bookstore.Server.Controllers
         }
 
         //[Authorize(Roles = "Admin")]
-        [HttpPost("creating")]
+        [HttpPost("adding")]
         public async Task<IActionResult> AddBook([FromBody] BookAddRequest request)
         {
             var response = await _bookService.AddBook(request);
@@ -46,7 +46,7 @@ namespace bookstore.Server.Controllers
         }
 
         //[Authorize(Roles = "Admin")]
-        [HttpDelete("delele/{Id}")]
+        [HttpDelete("delete/{Id}")]
         public async Task<IActionResult> DeleteBook([FromRoute] int Id)
         {
             var response = await _bookService.DeleteBook(Id);

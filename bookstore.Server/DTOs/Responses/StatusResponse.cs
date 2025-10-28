@@ -10,5 +10,9 @@
             Success = status;
             Message = message;
         }
+
+        public StatusResponse()
+        {
+        }
     }
 }
