@@ -83,10 +83,10 @@ namespace bookstore.Server.Services.implementations
 
             foreach (CartItemUpdateRequest item in request)
             {
-                Book book = await _bookRepository.GetByIdAsync(item.BookId);
+                Book book = await _bookRepository.GetByIdAsync(item.Id);
                 CartDetail cartDetail = new CartDetail
                 {
-                    BookId = item.BookId,
+                    BookId = item.Id,
                     Quantity = item.Quantity,
                     CartId = (int)_currentCartId,
                 };
