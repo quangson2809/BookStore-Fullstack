@@ -13,7 +13,7 @@ namespace bookstore.Server.Repositories.Implementations
 
         }
 
-        public async Task AddBookToCart(int cartId, int Quantity, Book book)
+        public async Task AddBookToCart(int cartId, int Quantity, int BookId )
         {
             var cart = await _table
                 .Include(c => c.CartDetails)
@@ -21,9 +21,8 @@ namespace bookstore.Server.Repositories.Implementations
 
              cart.CartDetails.Add(new CartDetail
             {
-                BookId = book.BookId,
-                Quantity = Quantity,
-                TotalAmount = Quantity * book.SalePrice
+                BookId = BookId,
+                Quantity = Quantity
             });
         }
 

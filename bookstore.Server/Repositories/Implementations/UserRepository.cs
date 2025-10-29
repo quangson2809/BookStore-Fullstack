@@ -22,6 +22,8 @@ namespace bookstore.Server.Repositories.Implementations
         public async Task<User?> GetByPhone(string phone)
         {
             var user = await _table.Include(u => u.Role)
+                .Include(u => u.Carts)
+                .Include(u => u.Orders)
                .FirstOrDefaultAsync(u => u.Phone == phone);
             if (user == null) return null;
             return user;

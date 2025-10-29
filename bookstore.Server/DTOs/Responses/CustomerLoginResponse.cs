@@ -11,7 +11,9 @@
         public string? Email { get; set; }
 
         public string? Phone { get; set; }
-        
+        public int CartId { get; set; }
+        public int OrderId { get; set; }
+        public List<int> OrderIds { get; set; } = new List<int>();
         public bool Success { get; set; } = true;
     }
 }
