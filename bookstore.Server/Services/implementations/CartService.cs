@@ -30,39 +30,6 @@ namespace bookstore.Server.Services.implementations
             _cartDetailRepository = cartDetailRepository;
         }
 
-        public async Task<StatusResponse> AddBookToCard(int Quantity, int BookId)
-        {
-            Book book = await _bookRepository.GetByIdAsync(BookId);
-            if (book == null || book.StockQuantity < Quantity)
-                {
-                return new StatusResponse(false, "Book not found or insufficient stock.");
-            }
-
-            if ( _currentCartId == null)
-            {
-                int userId = _sessionManager.GetUserId();
-                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
-            }
-           
-            await _cartRepository.AddBookToCart((int)_currentCartId, Quantity, book);
-            await _dbContext.SaveChangesAsync();
-            return new StatusResponse(false, "đã thêm");
-        }
-
-        public async Task<CartDetailResponse> GetDetailCart()
-        {
-            if (_currentCartId == null)
-            {
-                int userId = _sessionManager.GetUserId();
-                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
-            }
-
-            Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
-            CartDetailResponse detailCartResponse = new CartDetailResponse(cart);
-           
-            return detailCartResponse;
-        }
-
         public async Task<StatusResponse> RemoveBookFromCart(int bookId)
         {
             if (_currentCartId == null)
@@ -72,6 +39,13 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _cartRepository.RemoveBookFromCart((int)_currentCartId, bookId);
+            await _dbContext.SaveChangesAsync();
+            return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
+        }
+
+        public async Task<StatusResponse> RemoveBookFromCart(int CartId, int bookId)
+        {
+            await _cartRepository.RemoveBookFromCart(CartId, bookId);
             await _dbContext.SaveChangesAsync();
             return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
         }
@@ -97,15 +71,134 @@ namespace bookstore.Server.Services.implementations
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateCart(int Quantity, int bookId)
+        public async Task<StatusResponse> UpdateCart(int bookId, int Quantity)
         {
-            await _cartDetailRepository.UpdateCartDetail((int)_currentCartId, bookId, Quantity);
+            await _cartDetailRepository.UpdateBookCart((int)_currentCartId, bookId, Quantity);
             await _dbContext.SaveChangesAsync();
+            return new StatusResponse(true, "Đã cập nhật");
+        }
+
+        public async Task<StatusResponse> UpdateCart(int CartId, int bookId, int Quantity)
+        {
+            await _cartDetailRepository.UpdateBookCart(CartId, bookId, Quantity);
+            await _dbContext.SaveChangesAsync();
+            return new StatusResponse(true, "Đã cập nhật");
         }
 
         public async Task CreateCartForUser(Cart cart)
         {
             await _cartRepository.AddAsync( cart);
+        }
+
+        public async Task<CartDetailResponse> GetDetailCart()
+        {
+            if (_currentCartId == null)
+            {
+                int userId = _sessionManager.GetUserId();
+                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
+            }
+
+            Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
+
+            CartDetailResponse detailCartResponse = new CartDetailResponse();
+             
+            foreach (CartDetail cartDetail in cart.CartDetails)
+            {
+                BookCartOverviewResponse item = new BookCartOverviewResponse() {
+                    Id = cartDetail.BookId,
+                    Name = cartDetail.Book.BookName,
+                    Author = cartDetail.Book.Author,
+                    SalePrice = (int)cartDetail.Book.SalePrice,
+                    Quantity = cartDetail.Quantity,
+                    TotalAmount = (int)cartDetail.Book.SalePrice * cartDetail.Quantity
+                };
+              
+                detailCartResponse.Items.Add(item);
+                detailCartResponse.TotalPrice += item.TotalAmount;
+            }
+
+            return detailCartResponse;
+        }
+
+        public async Task<CartDetailResponse> GetDetailCart(int CartId)
+        {
+            Cart cart = await _cartRepository.GetByIdAsync(CartId);
+
+            CartDetailResponse detailCartResponse = new CartDetailResponse();
+
+            foreach (CartDetail cartDetail in cart.CartDetails)
+            {
+                BookCartOverviewResponse item = new BookCartOverviewResponse()
+                {
+                    Id = cartDetail.BookId,
+                    Name = cartDetail.Book.BookName,
+                    Author = cartDetail.Book.Author,
+                    SalePrice = (int)cartDetail.Book.SalePrice,
+                    Quantity = cartDetail.Quantity,
+                    TotalAmount = (int)cartDetail.Book.SalePrice * cartDetail.Quantity
+                };
+
+                detailCartResponse.Items.Add(item);
+                detailCartResponse.TotalPrice += item.TotalAmount;
+            }
+
+            return detailCartResponse;
+        }
+
+
+        public async Task<StatusResponse> AddBookToCard( int BookId, int Quantity)
+        {
+
+            if (_currentCartId == null)
+            {
+                int userId = _sessionManager.GetUserId();
+                _currentCartId = await _cartRepository.GetCartIdByUserId(userId);
+            }
+
+            Cart cart = await _cartRepository.GetByIdAsync((int)_currentCartId);
+            int old_Quantity = 0;
+            bool bookExistsInCart = false;
+            foreach (CartDetail cd in cart.CartDetails)
+            {
+                if (cd.BookId == BookId)
+                {
+                    bookExistsInCart = true;
+                    old_Quantity = cd.Quantity;
+                    break;
+                }
+
+            }
+            if (bookExistsInCart)
+            {
+                return await UpdateCart((int)_currentCartId, BookId, old_Quantity + Quantity);
+            }
+            await _cartDetailRepository.AddBookCart((int)_currentCartId, BookId, Quantity);
+            await _dbContext.SaveChangesAsync();
+            return new StatusResponse(true, "Đã thêm");
+        }
+
+        public async Task<StatusResponse> AddBookToCard( int CartId, int BookId, int Quantity)
+        {
+            Cart cart =  await _cartRepository.GetByIdAsync(CartId);
+            int old_Quantity = 0;
+            bool bookExistsInCart = false;
+            foreach (CartDetail cd in cart.CartDetails)
+            {
+                if (cd.BookId == BookId)
+                {
+                    bookExistsInCart = true;
+                    old_Quantity = cd.Quantity;
+                    break;
+                }
+                
+            }
+            if (bookExistsInCart)
+            {
+               return await UpdateCart(CartId, BookId, old_Quantity + Quantity);
+            }
+            await _cartDetailRepository.AddBookCart(CartId,BookId, Quantity);
+            await _dbContext.SaveChangesAsync();
+            return new StatusResponse(true, "Đã thêm");
         }
     }
 }

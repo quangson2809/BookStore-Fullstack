@@ -1,4 +1,4 @@
-﻿using bookstore.Server.DTOs.Requests;
+﻿ using bookstore.Server.DTOs.Requests;
 using bookstore.Server.DTOs.Responses;
 using bookstore.Server.Services.Interfaces;
 using bookstore.Server.Repositories;
@@ -70,14 +70,17 @@ namespace bookstore.Server.Services.Implementations
                 await _authCookieManager.Set(user);
                 //
                 int userId = _sessionManager.GetUserId();
-                return new CustomerLoginResponse()
+                CustomerLoginResponse response = new CustomerLoginResponse()
                 {
                     UserId = user.UserId,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
                     Phone = user.Phone,
+                    CartId = user.Carts.Any<Cart>() ? user.Carts.First<Cart>().CartId : 0,
                 };
+                user.Orders.ToList().ForEach(o => response.OrderIds.Add(o.OrdersId));
+                return response;
             }
 
             throw new Exception("SĐT đăng nhập hoặc mật khẩu không dúng");

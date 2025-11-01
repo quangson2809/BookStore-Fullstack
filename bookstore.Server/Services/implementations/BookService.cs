@@ -62,9 +62,28 @@ namespace bookstore.Server.Services.implementations
         {
             //List<Book> books = await _bookRespository.GetAllAsync();
             List<BookHomeOverviewResponse> bookHome= new List<BookHomeOverviewResponse>();
-            foreach (var item in await _bookRespository.GetAllAsync())
+            foreach (Book book in await _bookRespository.GetAllAsync())
             {
-                bookHome.Add(new BookHomeOverviewResponse(item));
+                BookHomeOverviewResponse item = new BookHomeOverviewResponse()
+                {
+                    Id = book.BookId,
+                    Name = book.BookName,
+                    Author = book.Author,
+                    Publisher = book.Publisher,
+                    SalePrice = (int)book.SalePrice,
+                    OriginalPrice = (int)book.OriginalPrice,
+                    Quantity = (int)book.StockQuantity,
+                    Language = book.Language
+                };
+                foreach (var bookimage in book.BookImages)
+                {
+                    if (bookimage.IsMain == true)
+                    {
+                        item.ImageLink = bookimage.BookImageUrl;
+                        break;
+                    }
+                }
+                bookHome.Add(item);
             }
             return bookHome;
         }

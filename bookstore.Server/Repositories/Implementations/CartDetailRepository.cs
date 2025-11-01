@@ -11,7 +11,7 @@ namespace bookstore.Server.Repositories.Implementations
         {   
         }
 
-        public async Task UpdateCartDetail(int cartId, int bookId, int Quantity)
+        public async Task UpdateBookCart(int cartId, int bookId, int Quantity)
         {
             await _table
                 .Where(cd => cd.CartId == cartId && cd.BookId == bookId)
@@ -19,5 +19,16 @@ namespace bookstore.Server.Repositories.Implementations
                     .SetProperty(cdt => cdt.Quantity, Quantity)
                 );
         }
+        public async Task AddBookCart(int CartId, int BookId, int Quantity)
+        {
+            var cartDetail = new CartDetail
+            {
+                CartId = CartId,
+                BookId = BookId,
+                Quantity = Quantity
+            };
+            await _table.AddAsync(cartDetail);
+        }
+
     }
 }
