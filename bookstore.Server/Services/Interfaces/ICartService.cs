@@ -14,8 +14,8 @@ namespace bookstore.Server.Services.Interfaces
 
         Task UpdateCart(List<CartItemUpdateRequest> request);
 
-        Task UpdateCart(int Quantity, int bookId);
-        Task UpdateCart(int Quantity,int CartId, int bookId);
+        Task <StatusResponse>UpdateCart(int Quantity, int bookId);
+        Task <StatusResponse>UpdateCart(int Quantity,int CartId, int bookId);
 
         Task<StatusResponse> RemoveBookFromCart(int BookId);
         Task<StatusResponse> RemoveBookFromCart(int CartId, int BookId);

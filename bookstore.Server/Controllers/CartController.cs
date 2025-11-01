@@ -23,11 +23,11 @@ namespace bookstore.Server.Controllers
         //    return Ok(cartDetail);
         //}
 
-        //[HttpPatch("updating")]
+        //[HttpPatch("updatingList")]
         //public async Task<IActionResult> UpdateCart([FromBody] List<CartItemUpdateRequest> request)
         //{
-        //    await _cartService.UpdateCart(request);
-        //    return Ok();
+        //    var response = await _cartService.UpdateCart(request);
+        //    return Ok(response);
         //}
 
         [HttpGet("{CartId}")]
@@ -40,15 +40,15 @@ namespace bookstore.Server.Controllers
         //[HttpPost("adding/{ItemId}")]
         //public async Task<IActionResult> AddBookToCart([FromBody] CartItemAddRequest request, [FromRoute] int ItemId)
         //{
-        //    await _cartService.AddBookToCard(request.Quantity, ItemId);
-        //    return Ok();
+        //    var response = await _cartService.AddBookToCard(ItemId, request.Quantity);
+        //    return Ok(response);
         //}
 
         [HttpPost("{CartId}/adding/{ItemId}")]
         public async Task<IActionResult> AddBookToCart([FromBody] CartItemAddRequest request,[FromRoute] int CartId, [FromRoute] int ItemId)
         {
-            await _cartService.AddBookToCard(CartId, request.Quantity, ItemId);
-            return Ok();
+            var response = await _cartService.AddBookToCard(CartId, ItemId,request.Quantity);
+            return Ok(response);
         }
 
         //[HttpDelete("deleting/{ItemId}")]
@@ -65,18 +65,18 @@ namespace bookstore.Server.Controllers
             return Ok(response);
         }
 
-        //[HttpPatch("updating-item/{Id}")]
-        //public async Task<IActionResult> UpdateItem([FromBody] CartItemUpdateRequest request, [FromRoute] int Id)
+        //[HttpPatch("updating/{Id}")]
+        //public async Task<IActionResult> UpdateItem([FromBody] CartItemAddRequest request, [FromRoute] int Id)
         //{
-        //    await _cartService.AddBookToCard(request.Quantity, Id);
-        //    return Ok();
+        //    var response =await _cartService.UpdateCart(ItemId, request.Quantity);
+        //    return Ok(response);
         //}
 
-        [HttpPatch("{CartId}/updating-item/{ItemId}")]
-        public async Task<IActionResult> UpdateItem([FromBody] CartItemUpdateRequest request,[FromRoute] int CartId ,[FromRoute] int ItemId)
+        [HttpPatch("{CartId}/updating/{ItemId}")]
+        public async Task<IActionResult> UpdateItem([FromBody] CartItemAddRequest request,[FromRoute] int CartId ,[FromRoute] int ItemId)
         {
-            await _cartService.AddBookToCard(request.Quantity, CartId,ItemId);
-            return Ok();
+            var response = await _cartService.UpdateCart(CartId, ItemId, request.Quantity);
+            return Ok(response);
         }
     }
 }

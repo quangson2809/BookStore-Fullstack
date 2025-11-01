@@ -74,13 +74,12 @@ export default tseslint.config([
 -http://localhost:5121/api/book/updating
 
 
--http://localhost:5121/api/Cart/cart
--http://localhost:5121/api/Cart/adding/{Id}
--http://localhost:5121/api/Cart/updating
--http://localhost:5121/api/cart/updating-item/{Id}
--http://localhost:5121/api/cart/deleting/{Id}
+-http://localhost:5121/api/Cart/{CartId}
+-http://localhost:5121/api/Cart/{CartId}/adding/{ItemId}
+-http://localhost:5121/api/cart/{CartId/updating/{ItemId}
+-http://localhost:5121/api/cart/{CardId}/deleting/{ItemId}
 
-test post: 
+test : 
 curl -X POST http://localhost:5121/api/Auth/Customer/login ^
 More?      -H "Content-Type: application/json" ^
 More?      -d "{\"PhoneNumber\":\"0123456789\", \"Password\":\"123456\"}"
@@ -105,3 +104,20 @@ curl -X POST "http://localhost:5121/api/book/adding"
 -d "{\"imageUrls\":[\"book1.jpg\",\"book2.jpg\"],\"name\":\"Lập trình C# nâng cao\",\"isbn\":\"9786041234567\",
 \"author\":\"Nguyễn Văn A\",\"publisher\":\"NXB Trẻ\",\"quantity\":50,\"salePrice\":120000,\"originalPrice\":150000,
 \"pageNumber\":350,\"publishTime\":\"2024-03-10T00:00:00\",\"categoryId\":3,\"language\":\"Tiếng Việt\"}"
+
+curl -X POST http://localhost:5121/api/Cart/1/adding/2 ^
+-H "Content-Type: application/json" ^
+-d "{\"Id\":0,\"Quantity\":3}"
+
+C:\Users\Admin>curl -X POST http://localhost:5121/api/Cart/1/adding/2 ^
+More? -H "Content-Type: application/json" ^
+More? -d "{\"Quantity\":3}"
+
+C:\Users\Admin>curl -X Patch http://localhost:5121/api/Cart/1/updating/2 ^
+More? -H "Content-Type: application/json" ^
+More? -d "{\"Quantity\":3}"
+{"success":true,"message":"Đã cập nhật"}
+
+C:\Users\Admin>curl -X GET http://localhost:5121/api/Cart/1
+
+C:\Users\Admin>curl -X DELETE http://localhost:5121/api/Cart/1/deleting/2
