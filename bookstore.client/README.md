@@ -121,3 +121,20 @@ More? -d "{\"Quantity\":3}"
 C:\Users\Admin>curl -X GET http://localhost:5121/api/Cart/1
 
 C:\Users\Admin>curl -X DELETE http://localhost:5121/api/Cart/1/deleting/2
+
+curl -X POST "http://localhost:5121/api/book/adding" ^
+  -H "accept: */*" ^
+  -H "Content-Type: multipart/form-data" ^
+  -F "Name=Clean Code" ^
+  -F "ISBN=9780132350884" ^
+  -F "Author=Robert C. Martin" ^
+  -F "Publisher=Pearson" ^
+  -F "Quantity=10" ^
+  -F "SalePrice=300000" ^
+  -F "OriginalPrice=450000" ^
+  -F "PageNumber=464" ^
+  -F "PublishTime=2020-01-01" ^
+  -F "CategoryId=1" ^
+  -F "Language=English" ^
+  -F "Images=@\"C:\Users\Admin\Downloads\Xác thực_m2.jpg\"" ^
+  -F "Images=@\"C:\Users\Admin\Downloads\Thao tác với kq hoạt động _ m2.jpg\""

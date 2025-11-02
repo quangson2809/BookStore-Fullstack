@@ -13,14 +13,19 @@ namespace bookstore.Server.Services.implementations
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRespository;
+
         private readonly BookStoreDbContext _dbContext;
-        public BookService(BookStoreDbContext dbContext, IBookRepository bookRepository)
+
+        private IFileService _fileService;
+
+        public BookService(BookStoreDbContext dbContext, IBookRepository bookRepository, IFileService fileService)
         {
+            _fileService = fileService;
             _bookRespository = bookRepository;
             _dbContext = dbContext;
         }
 
-        public async Task<StatusResponse> AddBook(BookAddRequest request)
+        public async Task<StatusResponse> AddBook(BookAddRequest request, List<IFormFile> formFiles)
         {
             Book book = new Book()
             {
@@ -34,16 +39,16 @@ namespace bookstore.Server.Services.implementations
                 PageNumber = request.PageNumber,
                 PublishTime = request.PublishTime,
                 CategoryId = request.CategoryId,
-                Language = request.Language
-            }; 
-            if (request.ImageUrls.Count != 0 )
-                foreach (var imageurl in request.ImageUrls)
-                {
-                    book.BookImages.Add(new BookImage() 
-                    { 
-                        BookImageUrl = imageurl
-                    });
-                }
+                Language = request.Language,
+                BookImages = new List<BookImage>()
+            };
+
+            foreach (var file in formFiles)
+            {
+                book.BookImages.Add( new BookImage(){
+                    BookImageUrl = await _fileService.UpLoadFile(file)
+                });
+            }
 
             await _bookRespository.Create(book);
             await _dbContext.SaveChangesAsync();
@@ -75,13 +80,11 @@ namespace bookstore.Server.Services.implementations
                     Quantity = (int)book.StockQuantity,
                     Language = book.Language
                 };
+
                 foreach (var bookimage in book.BookImages)
                 {
-                    if (bookimage.IsMain == true)
-                    {
-                        item.ImageLink = bookimage.BookImageUrl;
-                        break;
-                    }
+                    item.ImageLink = bookimage.BookImageUrl;
+                    break;
                 }
                 bookHome.Add(item);
             }

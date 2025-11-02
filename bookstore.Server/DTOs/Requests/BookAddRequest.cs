@@ -2,7 +2,6 @@
 {
     public class BookAddRequest
     {
-        public List<string> ImageUrls { get; set; } = new List<string>();
         public string Name { get; set; }
         public string ISBN { get; set; }
         public string Author { get; set; }

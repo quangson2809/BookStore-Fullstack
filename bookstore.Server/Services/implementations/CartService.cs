@@ -112,7 +112,13 @@ namespace bookstore.Server.Services.implementations
                     Quantity = cartDetail.Quantity,
                     TotalAmount = (int)cartDetail.Book.SalePrice * cartDetail.Quantity
                 };
-              
+
+                foreach (var bookimage in cartDetail.Book.BookImages)
+                {
+                    item.ImageLink = bookimage.BookImageUrl;
+                    break;
+                }
+
                 detailCartResponse.Items.Add(item);
                 detailCartResponse.TotalPrice += item.TotalAmount;
             }
@@ -137,6 +143,12 @@ namespace bookstore.Server.Services.implementations
                     Quantity = cartDetail.Quantity,
                     TotalAmount = (int)cartDetail.Book.SalePrice * cartDetail.Quantity
                 };
+                
+                foreach (var bookimage in cartDetail.Book.BookImages)
+                {
+                    item.ImageLink = bookimage.BookImageUrl;
+                    break;
+                }
 
                 detailCartResponse.Items.Add(item);
                 detailCartResponse.TotalPrice += item.TotalAmount;

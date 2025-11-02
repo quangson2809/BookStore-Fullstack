@@ -69,6 +69,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IFileService, LocalFileService>(); 
 
 
 builder.Services.AddOpenApi();

@@ -18,9 +18,9 @@ namespace bookstore.Server.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpPost("adding")]
-        public async Task<IActionResult> AddBook([FromBody] BookAddRequest request)
+        public async Task<IActionResult> AddBook([FromForm] BookAddRequest request, [FromForm] List<IFormFile> Images)
         {
-            var response = await _bookService.AddBook(request);
+            var response = await _bookService.AddBook(request,Images);
             return Ok(response);
         }
 
