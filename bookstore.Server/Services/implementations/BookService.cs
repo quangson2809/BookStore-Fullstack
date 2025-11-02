@@ -68,6 +68,7 @@ namespace bookstore.Server.Services.implementations
                 {
                     Id = book.BookId,
                     Name = book.BookName,
+                    Category = book.Category != null ? book.Category.CategoryName : "",
                     Author = book.Author,
                     Publisher = book.Publisher,
                     SalePrice = (int)book.SalePrice,

@@ -1,11 +1,11 @@
-﻿:root {
+:root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -26,8 +26,8 @@
 
 html, body {
   height: 100%;
-  background-color: #ffffff !important;
-  color: #333333 !important;
+  background-color: #ffffff;
+  color: #333333;
 }
 
 body {
@@ -63,8 +63,8 @@ p, h1, h2, h3, h4, h5, h6 {
 /* Button styles */
 .btn {
   display: inline-block;
-  padding: 0.6rem 1.2rem; /* Thu nhỏ padding */
-  margin: 0.2rem; /* Thu nhỏ margin */
+  padding: 0.6rem 1.2rem;
+  margin: 0.2rem;
   border: none;
   border-radius: 4px;
   text-decoration: none;
@@ -72,7 +72,7 @@ p, h1, h2, h3, h4, h5, h6 {
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 13px; /* Thu nhỏ font size */
+  font-size: 13px;
 }
 
 .btn-primary {
@@ -96,9 +96,9 @@ p, h1, h2, h3, h4, h5, h6 {
 .card {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 6px; /* Thu nhỏ border-radius */
-  padding: 1.2rem; /* Thu nhỏ padding */
-  margin: 0.8rem 0; /* Thu nhỏ margin */
+  border-radius: 6px;
+  padding: 1.2rem;
+  margin: 0.8rem 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -122,7 +122,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 6px; /* Thu nhỏ scrollbar */
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -131,22 +131,9 @@ p, h1, h2, h3, h4, h5, h6 {
 
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
-  border-radius: 3px; /* Thu nhỏ border-radius */
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
