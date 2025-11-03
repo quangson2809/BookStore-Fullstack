@@ -19,7 +19,17 @@ using Microsoft.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.MaxDepth = 256;
+    });
+
+// ✅ Swagger cho .NET 8 / 9
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // cấu hình DBcontext với SQL server
 var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
@@ -92,8 +102,10 @@ app.UseCors("AllowViteClient");
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
 
 app.UseSession();
 app.UseAuthentication();
