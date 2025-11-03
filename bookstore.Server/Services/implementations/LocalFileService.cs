@@ -3,6 +3,7 @@ using bookstore.Server.Entities;
 using bookstore.Server.Repositories.Interfaces;
 using bookstore.Server.Services.Interfaces;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace bookstore.Server.Services.implementations
