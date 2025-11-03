@@ -62,6 +62,7 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartDetailRepository, CartDetailRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IImageRepoeitory, ImageRepoeitory>();
 
 // Đăng ký services
 builder.Services.AddScoped<IAuthService, AuthService>();

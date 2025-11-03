@@ -1,28 +1,29 @@
-﻿using bookstore.Server.DTOs.Requests;
+﻿using bookstore.Server.Data;
+using bookstore.Server.DTOs.Requests;
 using bookstore.Server.DTOs.Responses;
-using bookstore.Server.Services.Interfaces;
-using bookstore.Server.Repositories;
 using bookstore.Server.Entities;
+using bookstore.Server.Repositories;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
+using bookstore.Server.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
-using bookstore.Server.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bookstore.Server.Services.implementations
 {
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRespository;
-
-        private readonly BookStoreDbContext _dbContext;
+        private readonly IImageRepoeitory _imageRepository;
 
         private IFileService _fileService;
 
-        public BookService(BookStoreDbContext dbContext, IBookRepository bookRepository, IFileService fileService)
+        public BookService( IBookRepository bookRepository,IImageRepoeitory imageRepoeitory, IFileService fileService)
         {
             _fileService = fileService;
             _bookRespository = bookRepository;
-            _dbContext = dbContext;
+            _imageRepository = imageRepoeitory;
         }
 
         public async Task<StatusResponse> AddBook(BookAddRequest request, List<IFormFile> formFiles)
@@ -51,7 +52,7 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _bookRespository.Create(book);
-            await _dbContext.SaveChangesAsync();
+            await _bookRespository.SaveChangesAsync();
             return new StatusResponse(true, "Đã thêm sách mới");
         }
 
@@ -59,7 +60,7 @@ namespace bookstore.Server.Services.implementations
         public async Task<StatusResponse> DeleteBook(int bookId)
         {
             await _bookRespository.DeleteAsync(bookId);
-            await _dbContext.SaveChangesAsync();
+            await _bookRespository.SaveChangesAsync();
             return new StatusResponse(true, "Đã xoá sách");
         }
 
@@ -102,32 +103,52 @@ namespace bookstore.Server.Services.implementations
             return bookDetailResponse;
         }
 
-        public async Task<StatusResponse> UpdateBook(BookUpdateRequest request)
+        public async Task<StatusResponse> UpdateBook(int BookId, BookUpdateRequest request, List<IFormFile> Images)
         {
-            Book book = new Book()
+            // Lấy book từ db để có tracking entity
+            var book = await _bookRespository.GetByIdAsync(BookId);
+            if (book == null)
+                return new StatusResponse(false, "Sách không tồn tại");
+
+            // Cập nhật thuộc tính sách
+            book.BookName = request.Name;
+            book.Isbn = request.ISBN;
+            book.Author = request.Author;
+            book.Publisher = request.Publisher;
+            book.StockQuantity = request.Quantity;
+            book.SalePrice = request.SalePrice;
+            book.OriginalPrice = request.OriginalPrice;
+            book.PageNumber = request.PageNumber;
+            book.PublishTime = request.PublishTime;
+            book.CategoryId = request.CategoryId;
+            book.Language = request.Language;
+
+            if (request.ImageUrlsExit.Count() != 0)
             {
-                               BookId = request.Id,
-                BookName = request.Name,
-                Isbn = request.ISBN,
-                Author = request.Author,
-                Publisher = request.Publisher,
-                StockQuantity = request.Quantity,
-                SalePrice = request.SalePrice,
-                OriginalPrice = request.OriginalPrice,
-                PageNumber = request.PageNumber,
-                PublishTime = request.PublishTime,
-                CategoryId = request.CategoryId,
-                Language = request.Language,
-            };
-            foreach (var item in request.ImageUrls)
-            {
-                book.BookImages.Add(new BookImage
+                // Xóa các BookImage không còn trong ExistingImageUrls
+                var imagesToRemove = book.BookImages
+                    .Where(img => !request.ImageUrlsExit.Contains(img.BookImageUrl))
+                    .ToList();
+
+                // xoá file vật lý và url
+                foreach (var imgRemove in imagesToRemove)
                 {
-                    BookImageUrl = item,
-                });
+                    await _fileService.DeleteFile(imgRemove);
+                    await _imageRepository.Delete(imgRemove);
+                }
             }
-            await _bookRespository.UpdateAsync(book);
-            await _dbContext.SaveChangesAsync();
+
+            // Lưu ảnh mới, thêm vào BookImages
+            if(Images.Count() != 0)
+                foreach (var formFile in Images)
+                {
+                    var imageUrl = await _fileService.UpLoadFile(formFile);
+                    book.BookImages.Add(new BookImage { BookImageUrl = imageUrl });
+                }
+            
+            // Cập nhật lên repository/DbContext
+            await _bookRespository.SaveChangesAsync();
+
             return new StatusResponse(true, "Cập nhật sách thành công");
 
         }

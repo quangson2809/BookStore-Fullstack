@@ -70,7 +70,7 @@ export default tseslint.config([
 -http://localhost:5121/api/Book/books
 -http://localhost:5121/api/book/adding
 -http://localhost:5121/api/Book/book/{Id}
--http://localhost:5121/api/Book/delete/{Id}
+-http://localhost:5121/api/Book/deleting/{Id}
 -http://localhost:5121/api/book/updating
 
 
@@ -138,3 +138,17 @@ curl -X POST "http://localhost:5121/api/book/adding" ^
   -F "Language=English" ^
   -F "Images=@\"C:\Users\Admin\Downloads\Xác thực_m2.jpg\"" ^
   -F "Images=@\"C:\Users\Admin\Downloads\Thao tác với kq hoạt động _ m2.jpg\""
+
+  C:\Users\Admin>curl -X PATCH "http://localhost:5121/api/book/updating/307" ^
+  -H "accept: */*" ^
+  -F "Name=Giáo trình Lập trình C#" -F "ISBN=12121567890" -F "Author=Nguyễn Văn A"^
+  -F "Publisher=NXB Trẻ" ^
+  -F "Quantity=50" -F "SalePrice=90000" ^
+  -F "OriginalPrice=120000" ^
+  -F "PageNumber=250" ^
+  -F "PublishTime=2023-11-01T00:00:00" ^
+  -F "CategoryId=2" ^
+  -F "Language=Tiếng Việt" ^
+  -F "ImageUrlsExit[]=http://localhost:5121/images/old1.jpg"^
+  -F "ImageUrlsExit[]=http://localhost:5121/images/old2.jpg"^
+  -F "Images=@\"C:\Users\Admin\Downloads\Xác thực_m2.jpg\""

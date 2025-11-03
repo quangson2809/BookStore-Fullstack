@@ -46,7 +46,7 @@ namespace bookstore.Server.Controllers
         }
 
         //[Authorize(Roles = "Admin")]
-        [HttpDelete("delete/{Id}")]
+        [HttpDelete("deleting/{Id}")]
         public async Task<IActionResult> DeleteBook([FromRoute] int Id)
         {
             var response = await _bookService.DeleteBook(Id);
@@ -54,10 +54,10 @@ namespace bookstore.Server.Controllers
         }
 
         //[Authorize(Roles = "Admin")]
-        [HttpPatch("updating")]
-        public async Task<IActionResult> UpdateBook( [FromBody] BookUpdateRequest request)
+        [HttpPatch("updating/{Id}")]
+        public async Task<IActionResult> UpdateBook([FromRoute] int Id, [FromForm] BookUpdateRequest request, [FromForm] List<IFormFile> Images)
         {
-            var response = await _bookService.UpdateBook(request);
+            var response = await _bookService.UpdateBook(Id,request, Images);
             return Ok(response);
         }
 

@@ -11,6 +11,6 @@ namespace bookstore.Server.Services.Interfaces
         Task<StatusResponse> DeleteBook(int bookId);
         Task<BookDetailResponse> GetBookDetail(int bookId);
         Task<IEnumerable<BookHomeOverviewResponse>> GetAllBook();
-        Task<StatusResponse> UpdateBook(BookUpdateRequest request);
+        Task<StatusResponse> UpdateBook(int BookId,BookUpdateRequest request, List<IFormFile> Images);
     }
 }

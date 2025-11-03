@@ -13,7 +13,6 @@ namespace bookstore.Server.Services.implementations
 {
     public class CartService : ICartService
     {
-        private readonly BookStoreDbContext _dbContext;
         private readonly ICartRepository _cartRepository;
         private readonly SessionManager  _sessionManager;
         private readonly IBookRepository _bookRepository;
@@ -21,9 +20,8 @@ namespace bookstore.Server.Services.implementations
 
         private int? _currentCartId;
 
-        public CartService(BookStoreDbContext dbContext ,ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository, ICartDetailRepository cartDetailRepository)
+        public CartService(ICartRepository cartRepository,SessionManager sessionManager, IBookRepository bookRepository, ICartDetailRepository cartDetailRepository)
         {
-            _dbContext = dbContext;
             _sessionManager = sessionManager;
             _cartRepository = cartRepository;
             _bookRepository = bookRepository;
@@ -39,14 +37,14 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _cartRepository.RemoveBookFromCart((int)_currentCartId, bookId);
-            await _dbContext.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
         }
 
         public async Task<StatusResponse> RemoveBookFromCart(int CartId, int bookId)
         {
             await _cartRepository.RemoveBookFromCart(CartId, bookId);
-            await _dbContext.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã xóa sách khỏi giỏ hàng");
         }
 
@@ -68,20 +66,20 @@ namespace bookstore.Server.Services.implementations
             }
 
             await _cartRepository.UpdateAsync(cart);
-            await _dbContext.SaveChangesAsync();
+            await _cartRepository.SaveChangesAsync();
         }
 
         public async Task<StatusResponse> UpdateCart(int bookId, int Quantity)
         {
             await _cartDetailRepository.UpdateBookCart((int)_currentCartId, bookId, Quantity);
-            await _dbContext.SaveChangesAsync();
+            await _cartDetailRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã cập nhật");
         }
 
         public async Task<StatusResponse> UpdateCart(int CartId, int bookId, int Quantity)
         {
             await _cartDetailRepository.UpdateBookCart(CartId, bookId, Quantity);
-            await _dbContext.SaveChangesAsync();
+            await _cartDetailRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã cập nhật");
         }
 
@@ -185,7 +183,7 @@ namespace bookstore.Server.Services.implementations
                 return await UpdateCart((int)_currentCartId, BookId, old_Quantity + Quantity);
             }
             await _cartDetailRepository.AddBookCart((int)_currentCartId, BookId, Quantity);
-            await _dbContext.SaveChangesAsync();
+            await _cartDetailRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã thêm");
         }
 
@@ -209,7 +207,7 @@ namespace bookstore.Server.Services.implementations
                return await UpdateCart(CartId, BookId, old_Quantity + Quantity);
             }
             await _cartDetailRepository.AddBookCart(CartId,BookId, Quantity);
-            await _dbContext.SaveChangesAsync();
+            await _cartDetailRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đã thêm");
         }
     }
