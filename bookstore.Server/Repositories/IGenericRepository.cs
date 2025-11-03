@@ -7,6 +7,6 @@
         Task<IEnumerable<E>> GetAllAsync();
         Task AddAsync(E entity);
         Task UpdateAsync(E entity);
-
+        Task SaveChangesAsync();
     }
 }

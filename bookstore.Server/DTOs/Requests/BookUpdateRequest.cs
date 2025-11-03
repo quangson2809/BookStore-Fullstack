@@ -2,8 +2,7 @@
 {
     public class BookUpdateRequest
     {
-        public int Id { get; set; }
-        public List<string> ImageUrls { get; set; } = new List<string>();
+        public List<string> ImageUrlsExit { get; set; } = new List<string>();
         public string Name { get; set; }
         public string ISBN { get; set; }
         public string Author { get; set; }

@@ -16,15 +16,13 @@ namespace bookstore.Server.Services.Implementations
 {
     public class AuthService : IAuthService
     {
-        private readonly BookStoreDbContext _dbContext;
         private readonly IUserRepository _userRepository;
         private readonly SessionManager _sessionManager;
         private readonly AuthenticationCookieManager _authCookieManager;
         private readonly ICartService _cartService;
 
-        public AuthService(BookStoreDbContext dbContext,IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
+        public AuthService(IUserRepository  userRepository,SessionManager sessionManager,AuthenticationCookieManager authCookieManager,ICartService cartService)
         {
-            _dbContext = dbContext;
             _userRepository = userRepository;
             _sessionManager = sessionManager;
             _authCookieManager = authCookieManager;
@@ -85,6 +83,7 @@ namespace bookstore.Server.Services.Implementations
 
             throw new Exception("SĐT đăng nhập hoặc mật khẩu không dúng");
         }
+
         public async Task<StatusResponse> CustomerSignup(CustomerSignupRequest request) {
             if (await _userRepository.GetByPhone(request.PhoneNumber) != null )
             {
@@ -110,7 +109,7 @@ namespace bookstore.Server.Services.Implementations
             };
             await _cartService.CreateCartForUser(cart);
             await _userRepository.AddAsync(u);
-            await _dbContext.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             //u được Ef gán id sau khi save changes
             //await _authCookieManager.Set(u);
             //await _sessionManager.Set(u);
