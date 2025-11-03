@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import CheckoutModal, { ShippingInfo } from '@/components/CheckoutModal';
@@ -26,37 +26,21 @@ interface Order {
 }
 
 const Cart: React.FC = () => {
-    const { state, removeFromCart, updateQuantity, clearCart } = useCart();
+    const { state, removeFromCart, updateQuantity, clearCart, loadCart } = useCart();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('cart');
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
-    const [pendingOrders, setPendingOrders] = useState<Order[]>([
-        {
-            id: 'DH001',
-            items: [
-                { title: 'Nhà Giả Kim', author: 'Paulo Coelho', quantity: 1, price: 120000, imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop' },
-                { title: 'Sapiens', author: 'Yuval Noah Harari', quantity: 1, price: 125000, imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop' }
-            ],
-            total: 245000,
-            status: 'shipping',
-            orderDate: '2024-01-15',
-            estimatedDelivery: '2024-01-20'
-        }
-    ]);
+    // Mock orders (sẽ được thay thế bằng API sau)
+    const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
+    const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
 
-    const [completedOrders, setCompletedOrders] = useState<Order[]>([
-        {
-            id: 'DH002',
-            items: [
-                { title: 'Tôi Thấy Hoa Vàng Trên Cỏ Xanh', author: 'Nguyễn Nhật Ánh', quantity: 1, price: 85000, imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop' }
-            ],
-            total: 85000,
-            status: 'completed',
-            orderDate: '2024-01-10',
-            deliveredDate: '2024-01-13'
+    // Load cart on mount
+    useEffect(() => {
+        if (state.cartId) {
+            loadCart();
         }
-    ]);
+    }, []);
 
     const handleCheckout = () => {
         if (state.items.length === 0) {
@@ -67,8 +51,7 @@ const Cart: React.FC = () => {
     };
 
     const handleConfirmCheckout = (shippingInfo: ShippingInfo) => {
-        // Tạo đơn hàng mới
-        const newOrderId = `DH${String(pendingOrders.length + completedOrders.length + 3).padStart(3, '0')}`;
+        const newOrderId = `DH${String(Date.now()).slice(-6)}`;
         const newOrder: Order = {
             id: newOrderId,
             items: state.items.map(item => ({
@@ -85,28 +68,18 @@ const Cart: React.FC = () => {
             shippingInfo
         };
 
-        // Thêm vào pending orders
         setPendingOrders(prev => [newOrder, ...prev]);
-
-        // Xóa giỏ hàng
         clearCart();
-
-        // Đóng modal
         setIsCheckoutModalOpen(false);
-
-        // Hiển thị thông báo
         alert(`Đặt hàng thành công! Mã đơn hàng: ${newOrderId}`);
-
-        // Chuyển sang tab chờ giao hàng
+        
         setTimeout(() => {
             setActiveTab('pending');
         }, 500);
     };
 
     const handleConfirmDelivery = (orderId: string) => {
-        const confirmMessage = `Bạn có chắc chắn đã nhận được đơn hàng ${orderId}?`;
-        
-        if (window.confirm(confirmMessage)) {
+        if (window.confirm(`Bạn có chắc chắn đã nhận được đơn hàng ${orderId}?`)) {
             const orderToMove = pendingOrders.find(order => order.id === orderId);
             
             if (orderToMove) {
@@ -118,7 +91,6 @@ const Cart: React.FC = () => {
 
                 setPendingOrders(prev => prev.filter(order => order.id !== orderId));
                 setCompletedOrders(prev => [completedOrder, ...prev]);
-
                 alert(`Đơn hàng ${orderId} đã được xác nhận giao thành công!`);
 
                 setTimeout(() => {
@@ -130,6 +102,30 @@ const Cart: React.FC = () => {
 
     // Render Giỏ hàng
     const renderCartTab = () => {
+        if (state.isLoading) {
+            return (
+                <div className="empty-state">
+                    <p>Đang tải giỏ hàng...</p>
+                </div>
+            );
+        }
+
+        if (!state.cartId) {
+            return (
+                <div className="empty-state">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                    <p>Vui lòng đăng nhập để xem giỏ hàng</p>
+                    <button onClick={() => navigate('/login')} className="continue-shopping">
+                        Đăng nhập
+                    </button>
+                </div>
+            );
+        }
+
         if (state.items.length === 0) {
             return (
                 <div className="empty-state">
@@ -164,6 +160,7 @@ const Cart: React.FC = () => {
                                     <button
                                         onClick={() => updateQuantity(item.book.id, item.quantity - 1)}
                                         className="quantity-button"
+                                        disabled={state.isLoading}
                                     >
                                         -
                                     </button>
@@ -171,6 +168,7 @@ const Cart: React.FC = () => {
                                     <button
                                         onClick={() => updateQuantity(item.book.id, item.quantity + 1)}
                                         className="quantity-button"
+                                        disabled={state.isLoading}
                                     >
                                         +
                                     </button>
@@ -179,6 +177,7 @@ const Cart: React.FC = () => {
                                 <button
                                     onClick={() => removeFromCart(item.book.id)}
                                     className="remove-button"
+                                    disabled={state.isLoading}
                                 >
                                     Xóa
                                 </button>
@@ -206,7 +205,11 @@ const Cart: React.FC = () => {
                         <span>{state.total.toLocaleString('vi-VN')}đ</span>
                     </div>
 
-                    <button onClick={handleCheckout} className="checkout-button">
+                    <button 
+                        onClick={handleCheckout} 
+                        className="checkout-button"
+                        disabled={state.isLoading}
+                    >
                         Đặt hàng
                     </button>
 
@@ -427,7 +430,6 @@ const Cart: React.FC = () => {
                 </div>
             </div>
 
-            {/* Checkout Modal */}
             <CheckoutModal
                 isOpen={isCheckoutModalOpen}
                 onClose={() => setIsCheckoutModalOpen(false)}

@@ -1,5 +1,5 @@
-﻿import { useState } from 'react';
-import { Link } from 'react-router-dom';
+﻿import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './Header.css';
 
@@ -22,10 +22,62 @@ const mainCategories = [
   { id: "16", name: "Triết học", slug: "triet-hoc" },
 ];
 
+interface UserInfo {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  cartId: number;
+  orderIds: number[];
+}
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { state } = useCart();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { state, resetCart } = useCart();
+  const navigate = useNavigate();
   const itemCount = state.items.reduce((total, item) => total + item.quantity, 0);
+
+  useEffect(() => {
+    // Check login status
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const userData = localStorage.getItem('userInfo');
+    
+    setIsLoggedIn(loggedIn);
+    if (userData) {
+      setUserInfo(JSON.parse(userData));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      // Clear ALL user-related data from localStorage
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('adminUsername');
+      
+      // Reset cart completely
+      resetCart();
+      
+      // Update local state
+      setIsLoggedIn(false);
+      setUserInfo(null);
+      
+      // Navigate to home
+      navigate('/');
+      
+      // Show success message
+      setTimeout(() => {
+        alert('Đã đăng xuất thành công!');
+      }, 100);
+    }
+  };
 
   return (
     <header className="bookstore-header">
@@ -101,19 +153,39 @@ const Header = () => {
                 </div>
               </Link>
 
-              {/* Auth buttons - THEO MẪU HỌ YÊU CẦU */}
-              <div className="bookstore-auth-buttons">
-                <Link to="/login" className="bookstore-login-btn">
-                  <svg className="bookstore-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                  <span>Đăng nhập</span>
-                </Link>
-                <Link to="/register" className="bookstore-register-btn">
-                  Đăng ký
-                </Link>
-              </div>
+              {/* Auth buttons hoặc User info */}
+              {isLoggedIn && userInfo ? (
+                <div className="bookstore-user-section">
+                  <div className="bookstore-user-info">
+                    <svg className="bookstore-user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span className="bookstore-user-name">Xin chào, {userInfo.firstName}</span>
+                  </div>
+                  <button onClick={handleLogout} className="bookstore-logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                      <polyline points="16,17 21,12 16,7"/>
+                      <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    <span className="bookstore-action-text">Đăng xuất</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="bookstore-auth-buttons">
+                  <Link to="/login" className="bookstore-login-btn">
+                    <svg className="bookstore-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Đăng nhập</span>
+                  </Link>
+                  <Link to="/register" className="bookstore-register-btn">
+                    Đăng ký
+                  </Link>
+                </div>
+              )}
 
               {/* Mobile menu toggle */}
               <button 
@@ -215,18 +287,33 @@ const Header = () => {
               </div>
 
               {/* Mobile auth */}
-              <div className="bookstore-mobile-auth">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <button className="bookstore-mobile-auth-button bookstore-outline">
-                    Đăng nhập
+              {isLoggedIn && userInfo ? (
+                <div className="bookstore-mobile-user">
+                  <div className="bookstore-mobile-user-info">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Xin chào, {userInfo.firstName}</span>
+                  </div>
+                  <button onClick={handleLogout} className="bookstore-mobile-logout-btn">
+                    Đăng xuất
                   </button>
-                </Link>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <button className="bookstore-mobile-auth-button">
-                    Đăng ký
-                  </button>
-                </Link>
-              </div>
+                </div>
+              ) : (
+                <div className="bookstore-mobile-auth">
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <button className="bookstore-mobile-auth-button bookstore-outline">
+                      Đăng nhập
+                    </button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                    <button className="bookstore-mobile-auth-button">
+                      Đăng ký
+                    </button>
+                  </Link>
+                </div>
+              )}
 
               <div className="bookstore-mobile-links">
                 <Link to="/about" onClick={() => setIsMenuOpen(false)}>

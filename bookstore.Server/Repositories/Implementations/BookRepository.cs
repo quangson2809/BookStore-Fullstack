@@ -19,6 +19,7 @@ namespace bookstore.Server.Repositories.Implementations
         public async Task<IEnumerable<Book>> GetAllAsync()
         {
              return await _table
+                .Include(book => book.Category)
                 .Include(book => book.BookImages)
                 .ToListAsync();
             

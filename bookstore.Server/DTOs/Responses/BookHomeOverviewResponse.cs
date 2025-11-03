@@ -6,6 +6,7 @@ namespace bookstore.Server.DTOs.Responses
         public int Id { get; set; }
         public string ImageLink { get; set; }
         public string Name { get; set; }
+        public string Category { get; set; }
         public string Author { get; set; }
         public string Publisher { get; set; }
         public int SalePrice { get; set; }

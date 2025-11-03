@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class GenericRepository<E> : IGenericRepository<E> where E : class
 {
-    protected readonly BookStoreDbContext _dbContext;
+    public readonly BookStoreDbContext _dbContext;
     protected readonly DbSet<E> _table;
 
     public GenericRepository(BookStoreDbContext dbContext) {
@@ -40,6 +40,11 @@ public class GenericRepository<E> : IGenericRepository<E> where E : class
     public async Task UpdateAsync(E entity)
     {
         _table.Update(entity);
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }
 

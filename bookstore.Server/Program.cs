@@ -72,6 +72,7 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartDetailRepository, CartDetailRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IImageRepoeitory, ImageRepoeitory>();
 
 // Đăng ký services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -79,6 +80,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IFileService, LocalFileService>(); 
 
 
 builder.Services.AddOpenApi();
