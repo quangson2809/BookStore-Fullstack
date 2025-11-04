@@ -2,7 +2,7 @@
 bin/
 obj/
 
-# User & VS local files
+# Visual Studio local files
 .vs/
 *.user
 *.suo
@@ -16,6 +16,11 @@ appsettings.Development.json
 *.tmp
 *.bak
 
-# Node modules or frontend build (if any)
+# Node or front-end
 node_modules/
 wwwroot/lib/
+
+# Compiled DLLs
+*.dll
+*.exe
+*.pdb
