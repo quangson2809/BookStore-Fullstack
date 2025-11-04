@@ -2,184 +2,230 @@
 import './ImageUploader.css';
 
 interface ImageUploaderProps {
-  value?: string;
-  onChange: (imageUrl: string) => void;
-  label?: string;
-  required?: boolean;
+    value?: File[] | string[];  // Support both File array and string array
+    onChange: (files: File[]) => void;
+    label?: string;
+    required?: boolean;
+    maxImages?: number;
+    existingImages?: string[];  // URLs from server
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ 
-  value, 
-  onChange, 
-  label = "Hình ảnh sách",
-  required = false 
+const ImageUploader: React.FC<ImageUploaderProps> = ({
+    value = [],
+    onChange,
+    label = "Hình ảnh sách",
+    required = false,
+    maxImages = 5,
+    existingImages = []
 }) => {
-  const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string>(value || '');
-  const [dragOver, setDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
+    const [previews, setPreviews] = useState<string[]>([...existingImages]);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [keptExistingImages, setKeptExistingImages] = useState<string[]>([...existingImages]);
+    const [dragOver, setDragOver] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (file: File) => {
-    if (!file) return;
+    const handleFileSelect = async (files: FileList) => {
+        if (!files.length) return;
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      alert('Chỉ hỗ trợ file ảnh định dạng JPG, PNG, WEBP');
-      return;
-    }
+        const fileArray = Array.from(files);
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('Kích thước file không được vượt quá 5MB');
-      return;
-    }
+        // Check total images
+        if (previews.length + fileArray.length > maxImages) {
+            alert(`Chỉ được upload tối đa ${maxImages} ảnh`);
+            return;
+        }
 
-    setUploading(true);
+        // Validate file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        const invalidFiles = fileArray.filter(file => !allowedTypes.includes(file.type));
+        if (invalidFiles.length > 0) {
+            alert('Chỉ hỗ trợ file ảnh định dạng JPG, PNG, WEBP');
+            return;
+        }
 
-    try {
-      // Convert to base64 for preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        setPreview(base64);
-        onChange(base64);
-      };
-      reader.readAsDataURL(file);
+        // Validate file sizes (max 5MB each)
+        const maxSize = 5 * 1024 * 1024;
+        const oversizedFiles = fileArray.filter(file => file.size > maxSize);
+        if (oversizedFiles.length > 0) {
+            alert('Kích thước mỗi file không được vượt quá 5MB');
+            return;
+        }
 
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('Có lỗi khi upload ảnh');
-    } finally {
-      setUploading(false);
-    }
-  };
+        setUploading(true);
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  };
+        try {
+            // Create previews
+            const newPreviews: string[] = [];
+            for (const file of fileArray) {
+                const preview = URL.createObjectURL(file);
+                newPreviews.push(preview);
+            }
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  };
+            const updatedPreviews = [...previews, ...newPreviews];
+            const updatedFiles = [...selectedFiles, ...fileArray];
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
+            setPreviews(updatedPreviews);
+            setSelectedFiles(updatedFiles);
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
+            // Callback with all files (existing kept as empty, new as File objects)
+            onChange(updatedFiles);
 
-  const handleRemoveImage = () => {
-    setPreview('');
-    onChange('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+            console.error('Error uploading files:', error);
+            alert('Có lỗi khi upload ảnh');
+        } finally {
+            setUploading(false);
+        }
+    };
 
-  return (
-    <div className="image-uploader">
-      <label className="uploader-label">
-        {label} {required && <span className="required">*</span>}
-      </label>
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            handleFileSelect(e.target.files);
+        }
+    };
 
-      <div className="uploader-content">
-        {/* Upload Area */}
-        <div 
-          className={`upload-area ${dragOver ? 'drag-over' : ''} ${preview ? 'has-image' : ''}`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {preview ? (
-            <div className="image-preview">
-              <img src={preview} alt="Preview" />
-              <div className="image-overlay">
-                <button
-                  type="button"
-                  className="remove-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveImage();
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="3,6 5,6 21,6"/>
-                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
-                  </svg>
-                  Xóa
-                </button>
-                <button
-                  type="button"
-                  className="change-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  Đổi ảnh
-                </button>
-              </div>
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+
+        if (e.dataTransfer.files) {
+            handleFileSelect(e.dataTransfer.files);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+    };
+
+    const handleRemoveImage = (index: number) => {
+        const imageToRemove = previews[index];
+
+        // Check if it's an existing image from server
+        const existingIndex = keptExistingImages.indexOf(imageToRemove);
+
+        if (existingIndex !== -1) {
+            // Remove from existing images
+            const updatedKept = keptExistingImages.filter((_, i) => i !== existingIndex);
+            setKeptExistingImages(updatedKept);
+        } else {
+            // Remove from new files
+            const newFileIndex = index - keptExistingImages.length;
+            const updatedFiles = selectedFiles.filter((_, i) => i !== newFileIndex);
+            setSelectedFiles(updatedFiles);
+            onChange(updatedFiles);
+        }
+
+        // Remove preview
+        const updatedPreviews = previews.filter((_, i) => i !== index);
+        setPreviews(updatedPreviews);
+    };
+
+    const handleRemoveAll = () => {
+        setPreviews([]);
+        setSelectedFiles([]);
+        setKeptExistingImages([]);
+        onChange([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    return (
+        <div className="image-uploader">
+            <div className="uploader-header">
+                <label className="uploader-label">
+                    {label} {required && <span className="required">*</span>}
+                </label>
+                {previews.length > 0 && (
+                    <button
+                        type="button"
+                        className="remove-all-btn"
+                        onClick={handleRemoveAll}
+                    >
+                        Xóa tất cả ({previews.length})
+                    </button>
+                )}
             </div>
-          ) : (
-            <div className="upload-placeholder">
-              {uploading ? (
-                <div className="uploading">
-                  <div className="upload-spinner"></div>
-                  <p>Đang tải ảnh...</p>
-                </div>
-              ) : (
-                <>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21,15 16,10 5,21"/>
-                  </svg>
-                  <p className="upload-text">
-                    <span>Kéo thả ảnh vào đây hoặc</span>
-                    <span className="upload-link">chọn file</span>
-                  </p>
-                  <p className="upload-hint">
-                    Hỗ trợ JPG, PNG, WEBP (tối đa 5MB)
-                  </p>
-                </>
-              )}
+
+            <div className="uploader-content">
+                {/* Image Previews Grid */}
+                {previews.length > 0 && (
+                    <div className="images-grid">
+                        {previews.map((preview, index) => (
+                            <div key={index} className="image-preview-item">
+                                <img src={preview} alt={`Preview ${index + 1}`} />
+                                <button
+                                    type="button"
+                                    className="remove-image-btn"
+                                    onClick={() => handleRemoveImage(index)}
+                                >
+                                    ×
+                                </button>
+                                {index < keptExistingImages.length && (
+                                    <span className="existing-badge">Có sẵn</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Upload Area */}
+                {previews.length < maxImages && (
+                    <div
+                        className={`upload-area ${dragOver ? 'drag-over' : ''}`}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <div className="upload-placeholder">
+                            {uploading ? (
+                                <div className="uploading">
+                                    <div className="upload-spinner"></div>
+                                    <p>Đang tải ảnh...</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21,15 16,10 5,21" />
+                                    </svg>
+                                    <p className="upload-text">
+                                        <span>Kéo thả ảnh vào đây hoặc</span>
+                                        <span className="upload-link">chọn file</span>
+                                    </p>
+                                    <p className="upload-hint">
+                                        Hỗ trợ JPG, PNG, WEBP (tối đa 5MB mỗi file)
+                                    </p>
+                                    <p className="upload-count">
+                                        {previews.length}/{maxImages} ảnh
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
-          )}
+
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileInputChange}
+                style={{ display: 'none' }}
+            />
         </div>
-      </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileInputChange}
-        style={{ display: 'none' }}
-      />
-    </div>
-  );
+    );
 };
 
 export default ImageUploader;

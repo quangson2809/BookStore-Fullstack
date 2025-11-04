@@ -409,3 +409,4 @@ C:\Users\ADMIN\source\repos\bookstore-project\bookstore.Server\obj\Debug\net9.0\
 C:\Users\ADMIN\source\repos\bookstore-project\bookstore.Server\obj\Debug\net9.0\bookstore.Server.pdb
 C:\Users\ADMIN\source\repos\bookstore-project\bookstore.Server\obj\Debug\net9.0\bookstore.Server.genruntimeconfig.cache
 C:\Users\ADMIN\source\repos\bookstore-project\bookstore.Server\obj\Debug\net9.0\ref\bookstore.Server.dll
+C:\Users\ADMIN\source\repos\bookstore-project\bookstore.Server\bin\Debug\net9.0\bookstore.Server.staticwebassets.runtime.json

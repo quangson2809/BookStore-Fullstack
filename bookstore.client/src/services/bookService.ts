@@ -3,6 +3,13 @@ import type { Book, BookDetail } from '../types/Book';
 
 const API_BASE_URL = 'http://localhost:5121/api';
 
+// Helper function to build full image URL
+const buildImageUrl = (imageUrl: string | null | undefined): string => {
+    if (!imageUrl) return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `http://localhost:5121${imageUrl}`;
+};
+
 // Interface cho dữ liệu từ API backend
 interface ApiBook {
     id: number;
@@ -44,7 +51,11 @@ export interface BookFormData {
     publishTime: string;
     categoryId: number;
     language: string;
-    imageUrls?: string[];
+    images?: File[];
+}
+
+export interface BookUpdateFormData extends Partial<BookFormData> {
+    existingImageUrls?: string[];
 }
 
 export interface PaginatedResponse<T> {
@@ -80,13 +91,9 @@ const transformApiBook = (apiBook: ApiBook): Book => {
         stock: apiBook.quantity,
         quantity: apiBook.quantity,
         language: apiBook.language || 'Tiếng Việt',
-        imageUrl: apiBook.imageLink || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=400&fit=crop',
+        imageUrl: buildImageUrl(apiBook.imageLink), // ✅ Build full URL
         imageLink: apiBook.imageLink,
-
-        // Category từ API
         category: apiBook.category || 'Sách',
-
-        // Default values for display
         description: `${apiBook.name}${apiBook.author ? ` - Tác giả: ${apiBook.author}` : ''}`,
         isbn: '',
         publishedDate: new Date().toISOString(),
@@ -101,7 +108,7 @@ const transformApiBook = (apiBook: ApiBook): Book => {
 const transformApiBookDetail = (apiBookDetail: ApiBookDetail, bookId: number): Book => {
     const hasDiscount = apiBookDetail.originalPrice > apiBookDetail.salePrice;
     const mainImage = apiBookDetail.imageUrls.length > 0 
-        ? apiBookDetail.imageUrls[0] 
+        ? buildImageUrl(apiBookDetail.imageUrls[0])  // ✅ Build full URL
         : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&h=800&fit=crop';
 
     return {
@@ -118,16 +125,10 @@ const transformApiBookDetail = (apiBookDetail: ApiBookDetail, bookId: number): B
         language: apiBookDetail.language,
         imageUrl: mainImage,
         imageLink: mainImage,
-
-        // Category
         category: apiBookDetail.categoryName,
-
-        // Book details
         isbn: apiBookDetail.isbn,
         publishedDate: apiBookDetail.publicTime,
         description: `${apiBookDetail.name} - Một tác phẩm xuất sắc thuộc thể loại ${apiBookDetail.categoryName}. ${apiBookDetail.author ? `Tác giả: ${apiBookDetail.author}.` : ''} ${apiBookDetail.publisher ? `Nhà xuất bản: ${apiBookDetail.publisher}.` : ''} Cuốn sách có ${apiBookDetail.pageNumber} trang, được viết bằng ${apiBookDetail.language}.`,
-        
-        // Additional display info
         rating: Math.random() * 1 + 4,
         reviewCount: Math.floor(Math.random() * 1000) + 100,
         isNew: new Date(apiBookDetail.publicTime).getFullYear() >= new Date().getFullYear() - 1,
@@ -164,7 +165,6 @@ export const bookService = {
 
             let filteredBooks = [...books];
 
-            // Filter by search
             if (search) {
                 const lowercaseQuery = search.toLowerCase();
                 filteredBooks = filteredBooks.filter(book =>
@@ -174,14 +174,12 @@ export const bookService = {
                 );
             }
 
-            // Filter by category
             if (category) {
                 filteredBooks = filteredBooks.filter(book =>
                     book.category?.toLowerCase() === category.toLowerCase()
                 );
             }
 
-            // Sort
             filteredBooks.sort((a, b) => {
                 let aValue: any = a[sortBy as keyof Book];
                 let bValue: any = b[sortBy as keyof Book];
@@ -198,7 +196,6 @@ export const bookService = {
                 }
             });
 
-            // Pagination
             const totalItems = filteredBooks.length;
             const totalPages = Math.ceil(totalItems / limit);
             const startIndex = (page - 1) * limit;
@@ -230,11 +227,15 @@ export const bookService = {
         }
     },
 
-    // Get book detail (raw API response)
+    // Get book detail (raw API response with full image URLs)
     getBookDetail: async (id: number): Promise<BookDetail | null> => {
         try {
             const response = await axios.get<ApiBookDetail>(`${API_BASE_URL}/Book/book/${id}`);
-            return response.data;
+            // ✅ Transform image URLs to full URLs
+            return {
+                ...response.data,
+                imageUrls: response.data.imageUrls.map(url => buildImageUrl(url))
+            };
         } catch (error) {
             const axiosError = error as AxiosError;
             console.error('Error fetching book detail:', axiosError.message);
@@ -242,25 +243,39 @@ export const bookService = {
         }
     },
 
-    // Add new book
+    // Add new book with image upload
     addBook: async (bookData: BookFormData): Promise<Book> => {
         try {
-            const requestData = {
-                ImageUrls: bookData.imageUrls || [],
-                Name: bookData.name,
-                ISBN: bookData.isbn,
-                Author: bookData.author,
-                Publisher: bookData.publisher,
-                Quantity: bookData.quantity,
-                SalePrice: bookData.salePrice,
-                OriginalPrice: bookData.originalPrice,
-                PageNumber: bookData.pageNumber,
-                PublishTime: bookData.publishTime,
-                CategoryId: bookData.categoryId,
-                Language: bookData.language
-            };
+            const formData = new FormData();
+            
+            formData.append('Name', bookData.name);
+            formData.append('ISBN', bookData.isbn);
+            formData.append('Author', bookData.author);
+            formData.append('Publisher', bookData.publisher);
+            formData.append('Quantity', bookData.quantity.toString());
+            formData.append('SalePrice', bookData.salePrice.toString());
+            formData.append('OriginalPrice', bookData.originalPrice.toString());
+            formData.append('PageNumber', bookData.pageNumber.toString());
+            formData.append('PublishTime', bookData.publishTime);
+            formData.append('CategoryId', bookData.categoryId.toString());
+            formData.append('Language', bookData.language);
 
-            const response = await axios.post<ApiBook>(`${API_BASE_URL}/book/adding`, requestData);
+            if (bookData.images && bookData.images.length > 0) {
+                bookData.images.forEach((image) => {
+                    formData.append('Images', image);
+                });
+            }
+
+            const response = await axios.post<ApiBook>(
+                `${API_BASE_URL}/book/adding`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            
             return transformApiBook(response.data);
         } catch (error) {
             const axiosError = error as AxiosError;
@@ -269,27 +284,45 @@ export const bookService = {
         }
     },
 
-    // Update book
-    updateBook: async (id: number, bookData: Partial<BookFormData>): Promise<Book | null> => {
+    // Update book with image upload
+    updateBook: async (id: number, bookData: BookUpdateFormData): Promise<Book | null> => {
         try {
-            const requestData: Partial<Record<string, string | number | string[]>> = {
-                Id: id
-            };
+            const formData = new FormData();
 
-            if (bookData.name) requestData.Name = bookData.name;
-            if (bookData.isbn) requestData.ISBN = bookData.isbn;
-            if (bookData.author) requestData.Author = bookData.author;
-            if (bookData.publisher) requestData.Publisher = bookData.publisher;
-            if (bookData.quantity !== undefined) requestData.Quantity = bookData.quantity;
-            if (bookData.salePrice !== undefined) requestData.SalePrice = bookData.salePrice;
-            if (bookData.originalPrice !== undefined) requestData.OriginalPrice = bookData.originalPrice;
-            if (bookData.pageNumber) requestData.PageNumber = bookData.pageNumber;
-            if (bookData.publishTime) requestData.PublishTime = bookData.publishTime;
-            if (bookData.categoryId) requestData.CategoryId = bookData.categoryId;
-            if (bookData.language) requestData.Language = bookData.language;
-            if (bookData.imageUrls) requestData.ImageUrls = bookData.imageUrls;
+            if (bookData.name) formData.append('Name', bookData.name);
+            if (bookData.isbn) formData.append('ISBN', bookData.isbn);
+            if (bookData.author) formData.append('Author', bookData.author);
+            if (bookData.publisher) formData.append('Publisher', bookData.publisher);
+            if (bookData.quantity !== undefined) formData.append('Quantity', bookData.quantity.toString());
+            if (bookData.salePrice !== undefined) formData.append('SalePrice', bookData.salePrice.toString());
+            if (bookData.originalPrice !== undefined) formData.append('OriginalPrice', bookData.originalPrice.toString());
+            if (bookData.pageNumber) formData.append('PageNumber', bookData.pageNumber.toString());
+            if (bookData.publishTime) formData.append('PublishTime', bookData.publishTime);
+            if (bookData.categoryId) formData.append('CategoryId', bookData.categoryId.toString());
+            if (bookData.language) formData.append('Language', bookData.language);
 
-            const response = await axios.patch<ApiBook>(`${API_BASE_URL}/book/updating`, requestData);
+            if (bookData.existingImageUrls && bookData.existingImageUrls.length > 0) {
+                bookData.existingImageUrls.forEach((url) => {
+                    formData.append('ImageUrlsExit[]', url);
+                });
+            }
+
+            if (bookData.images && bookData.images.length > 0) {
+                bookData.images.forEach((image) => {
+                    formData.append('Images', image);
+                });
+            }
+
+            const response = await axios.patch<ApiBook>(
+                `${API_BASE_URL}/book/updating/${id}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            
             return transformApiBook(response.data);
         } catch (error) {
             const axiosError = error as AxiosError;
@@ -298,10 +331,9 @@ export const bookService = {
         }
     },
 
-    // Delete book
     deleteBook: async (id: number): Promise<boolean> => {
         try {
-            await axios.delete(`${API_BASE_URL}/Book/delete/${id}`);
+            await axios.delete(`${API_BASE_URL}/Book/deleting/${id}`);
             return true;
         } catch (error) {
             const axiosError = error as AxiosError;
@@ -310,7 +342,6 @@ export const bookService = {
         }
     },
 
-    // Search books
     searchBooks: async (query: string): Promise<Book[]> => {
         try {
             const books = await bookService.getAllBooks();
@@ -327,7 +358,6 @@ export const bookService = {
         }
     },
 
-    // Get books by category name
     getBooksByCategory: async (categoryName: string): Promise<Book[]> => {
         try {
             const books = await bookService.getAllBooks();

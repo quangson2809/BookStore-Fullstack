@@ -1,65 +1,78 @@
 ﻿import React, { useState } from 'react';
-import { BookFormData } from '../../../services/bookService';
+import { BookFormData, bookService } from '../../../services/bookService';
 import ImageUploader from '../../ImageUploader';
 import './AddBookModal.css';
 
 interface AddBookModalProps {
   onClose: () => void;
-  onSubmit: (bookData: BookFormData) => Promise<void>;
+  onSuccess: () => void; // ✅ Changed from onSubmit
 }
 
 const categories = [
-  'Văn học', 'Kinh tế', 'Thiếu nhi', 'Khoa học', 
-  'Công nghệ', 'Tâm lý', 'Lịch sử', 'Ngoại ngữ'
+  { id: 1, name: 'Văn học' },
+  { id: 2, name: 'Kinh tế' },
+  { id: 3, name: 'Thiếu nhi' },
+  { id: 4, name: 'Khoa học' },
+  { id: 5, name: 'Công nghệ' },
+  { id: 6, name: 'Tâm lý' },
+  { id: 7, name: 'Lịch sử' },
+  { id: 8, name: 'Ngoại ngữ' }
 ];
 
-const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
+const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState<BookFormData>({
-    title: '',
-    author: '',
-    price: 0,
-    originalPrice: 0,
-    description: '',
-    category: categories[0],
-    imageUrl: '',
+    name: '',
     isbn: '',
-    publishedDate: '',
-    stock: 0,
+    author: '',
     publisher: '',
-    isNew: true,
-    isBestseller: false
+    quantity: 0,
+    salePrice: 0,
+    originalPrice: 0,
+    pageNumber: 0,
+    publishTime: '',
+    categoryId: 1,
+    language: 'Tiếng Việt',
+    images: []
   });
   const [loading, setLoading] = useState(false);
 
+  const handleImagesChange = (files: File[]) => {
+    setFormData(prev => ({ ...prev, images: files }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate required fields
-    if (!formData.title || !formData.author || !formData.imageUrl || !formData.isbn || !formData.publisher) {
+
+    if (!formData.name || !formData.isbn || !formData.author || !formData.publisher) {
       alert('Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
 
-    if (formData.price <= 0) {
+    if (!formData.images || formData.images.length === 0) {
+      alert('Vui lòng upload ít nhất 1 ảnh');
+      return;
+    }
+
+    if (formData.salePrice <= 0 || formData.originalPrice <= 0) {
       alert('Giá sách phải lớn hơn 0');
       return;
     }
 
-    if (formData.stock < 0) {
-      alert('Số lượng tồn kho không được âm');
+    if (formData.pageNumber <= 0) {
+      alert('Số trang phải lớn hơn 0');
       return;
     }
 
     setLoading(true);
 
     try {
-      const submitData = {
-        ...formData,
-        originalPrice: formData.originalPrice || undefined
-      };
-      await onSubmit(submitData);
+      await bookService.addBook(formData);
+      alert('Thêm sách thành công!');
+      onSuccess(); // ✅ Call onSuccess
+      onClose();
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error adding book:', error);
+      alert('Có lỗi xảy ra khi thêm sách');
     } finally {
       setLoading(false);
     }
@@ -76,26 +89,41 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
           <h3>Thêm sách mới</h3>
           <button className="close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-body">
           <div className="form-grid">
+            {/* Tên sách */}
             <div className="form-group">
               <label className="form-label">Tên sách *</label>
               <input
                 type="text"
                 className="form-control"
-                value={formData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
+                value={formData.name}
+                onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="Nhập tên sách"
                 required
               />
             </div>
 
+            {/* ISBN */}
+            <div className="form-group">
+              <label className="form-label">ISBN *</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.isbn}
+                onChange={(e) => handleChange('isbn', e.target.value)}
+                placeholder="978-0-12-345678-9"
+                required
+              />
+            </div>
+
+            {/* Tác giả */}
             <div className="form-group">
               <label className="form-label">Tác giả *</label>
               <input
@@ -108,20 +136,7 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Danh mục *</label>
-              <select
-                className="form-control"
-                value={formData.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-                required
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-
+            {/* Nhà xuất bản */}
             <div className="form-group">
               <label className="form-label">Nhà xuất bản *</label>
               <input
@@ -134,29 +149,67 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
               />
             </div>
 
+            {/* Danh mục */}
             <div className="form-group">
-              <label className="form-label">ISBN *</label>
-              <input
-                type="text"
+              <label className="form-label">Danh mục *</label>
+              <select
                 className="form-control"
-                placeholder="978-0-12-345678-9"
-                value={formData.isbn}
-                onChange={(e) => handleChange('isbn', e.target.value)}
+                value={formData.categoryId}
+                onChange={(e) => handleChange('categoryId', parseInt(e.target.value))}
+                required
+              >
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Ngôn ngữ */}
+            <div className="form-group">
+              <label className="form-label">Ngôn ngữ *</label>
+              <select
+                className="form-control"
+                value={formData.language}
+                onChange={(e) => handleChange('language', e.target.value)}
+                required
+              >
+                <option value="Tiếng Việt">Tiếng Việt</option>
+                <option value="English">English</option>
+                <option value="中文">中文</option>
+                <option value="日本語">日本語</option>
+                <option value="한국어">한국어</option>
+              </select>
+            </div>
+
+            {/* Số lượng */}
+            <div className="form-group">
+              <label className="form-label">Số lượng *</label>
+              <input
+                type="number"
+                className="form-control"
+                min="0"
+                value={formData.quantity || ''}
+                onChange={(e) => handleChange('quantity', parseInt(e.target.value) || 0)}
+                placeholder="0"
                 required
               />
             </div>
 
+            {/* Số trang */}
             <div className="form-group">
-              <label className="form-label">Ngày xuất bản *</label>
+              <label className="form-label">Số trang *</label>
               <input
-                type="date"
+                type="number"
                 className="form-control"
-                value={formData.publishedDate}
-                onChange={(e) => handleChange('publishedDate', e.target.value)}
+                min="1"
+                value={formData.pageNumber || ''}
+                onChange={(e) => handleChange('pageNumber', parseInt(e.target.value) || 0)}
+                placeholder="0"
                 required
               />
             </div>
 
+            {/* Giá bán */}
             <div className="form-group">
               <label className="form-label">Giá bán (VNĐ) *</label>
               <input
@@ -164,15 +217,16 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
                 className="form-control"
                 min="0"
                 step="1000"
-                value={formData.price || ''}
-                onChange={(e) => handleChange('price', parseInt(e.target.value) || 0)}
+                value={formData.salePrice || ''}
+                onChange={(e) => handleChange('salePrice', parseInt(e.target.value) || 0)}
                 placeholder="0"
                 required
               />
             </div>
 
+            {/* Giá gốc */}
             <div className="form-group">
-              <label className="form-label">Giá gốc (VNĐ)</label>
+              <label className="form-label">Giá gốc (VNĐ) *</label>
               <input
                 type="number"
                 className="form-control"
@@ -181,18 +235,18 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
                 value={formData.originalPrice || ''}
                 onChange={(e) => handleChange('originalPrice', parseInt(e.target.value) || 0)}
                 placeholder="0"
+                required
               />
             </div>
 
+            {/* Ngày xuất bản */}
             <div className="form-group">
-              <label className="form-label">Số lượng tồn kho *</label>
+              <label className="form-label">Ngày xuất bản *</label>
               <input
-                type="number"
+                type="date"
                 className="form-control"
-                min="0"
-                value={formData.stock || ''}
-                onChange={(e) => handleChange('stock', parseInt(e.target.value) || 0)}
-                placeholder="0"
+                value={formData.publishTime}
+                onChange={(e) => handleChange('publishTime', e.target.value)}
                 required
               />
             </div>
@@ -200,49 +254,12 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
             {/* Image Upload - Full Width */}
             <div className="form-group image-upload-group">
               <ImageUploader
-                value={formData.imageUrl}
-                onChange={(imageUrl) => handleChange('imageUrl', imageUrl)}
+                value={formData.images}
+                onChange={handleImagesChange}
                 label="Hình ảnh sách"
                 required
+                maxImages={5}
               />
-            </div>
-
-            <div className="form-group full-width">
-              <label className="form-label">Mô tả *</label>
-              <textarea
-                className="form-control"
-                rows={4}
-                value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
-                placeholder="Nhập mô tả sách..."
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <div className="checkbox-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.isNew}
-                    onChange={(e) => handleChange('isNew', e.target.checked)}
-                  />
-                  <span>Sách mới</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <div className="checkbox-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.isBestseller}
-                    onChange={(e) => handleChange('isBestseller', e.target.checked)}
-                  />
-                  <span>Sách bán chạy</span>
-                </label>
-              </div>
             </div>
           </div>
         </form>
@@ -251,15 +268,15 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ onClose, onSubmit }) => {
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Hủy
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary"
             onClick={handleSubmit}
             disabled={loading}
           >
             {loading ? (
               <>
-                <div className="loading-spinner"></div>
+                <span className="loading-spinner">⏳</span>
                 Đang thêm...
               </>
             ) : (
