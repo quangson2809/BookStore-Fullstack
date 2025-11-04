@@ -1,11 +1,21 @@
-.vs/
+# Build output
 bin/
 obj/
+
+# User & VS local files
+.vs/
+*.user
+*.suo
+
+# Environment configs
+launchSettings.json
+appsettings.Development.json
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Node modules or frontend build (if any)
 node_modules/
-build/
-dist/
-.envs
-Models/
-Properties/
-Views/
-images/
+wwwroot/lib/
