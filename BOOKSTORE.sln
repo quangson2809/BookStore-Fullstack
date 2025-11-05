@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# SQL Server Management Studio Version 21
+# Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "bookstore.client", "bookstore.client\bookstore.client.esproj", "{5C0070B4-49F6-906F-3F34-875F1CBF5335}"
@@ -8,6 +8,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookstore.Server", "bookstore.Server\bookstore.Server.csproj", "{B3268290-21D7-449A-96FE-D889E11405E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bookstore.Tests", "bookstore.Tests\bookstore.Tests.csproj", "{49F03493-76A8-417B-A70D-392827E5300D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,15 +70,6 @@ Global
 		{49F03493-76A8-417B-A70D-392827E5300D}.Release|x64.Build.0 = Release|Any CPU
 		{49F03493-76A8-417B-A70D-392827E5300D}.Release|x86.ActiveCfg = Release|Any CPU
 		{49F03493-76A8-417B-A70D-392827E5300D}.Release|x86.Build.0 = Release|Any CPU
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Debug|Any CPU.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Debug|x64.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Debug|x86.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Default|Any CPU.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Default|x64.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Default|x86.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Release|Any CPU.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Release|x64.ActiveCfg = Default
-		{87A548FD-1B01-455C-8E52-DC082AD25731}.Release|x86.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

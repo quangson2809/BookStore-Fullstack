@@ -13,60 +13,54 @@ namespace bookstore.Server.Services.implementations
     public class OrderService : IOrderService
     {
         // Implement invoice-related methods here
-        private readonly BookStoreDbContext _context;
-        public OrderService(BookStoreDbContext context)
+        private readonly IOrderRepository _orderRepository;
+        private readonly IGenericRepository<OrdersDetail> _orderDetailRepo;
+        public OrderService(
+            IOrderRepository orderRepository,
+            IGenericRepository<OrdersDetail> orderDetailRepo)
         {
-            _context = context;
+            _orderRepository = orderRepository;
+            _orderDetailRepo = orderDetailRepo;
         }
         //Lấy tat cả đơn hàng
         public async Task<IEnumerable<OrderResponse>> GetAllAsync()
         {
-            return await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.Payment)
-                .Include(o => o.OrdersDetails)
-                    .ThenInclude(d => d.Book)
-                .Select(o => new OrderResponse
+            var orders = await _orderRepository.GetAllAsync();
+
+            return orders.Select(o => new OrderResponse
+            {
+                OrdersId = o.OrdersId,
+                OrdersStatus = o.OrdersStatus,
+                UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
+                PaymentMethod = o.Payment?.MethodName,
+                CreateTime = o.CreateTime,
+                OrderDetails = o.OrdersDetails.Select(d => new OrderDetailResponse
                 {
-                    OrdersId = o.OrdersId,
-                    OrdersStatus = o.OrdersStatus,
-                    UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
-                    PaymentMethod = o.Payment != null ? o.Payment.MethodName : null,
-                    CreateTime = o.CreateTime,
-                    OrderDetails = o.OrdersDetails.Select(d => new OrderDetailResponse
-                    {
-                        BookId = d.BookId,
-                        BookTitle = d.Book.BookName,
-                        Quantity = d.Quantity,
-                        TotalPrice = d.TotalPrice
-                    }).ToList()
-                })
-                .ToListAsync();
+                    BookId = d.BookId,
+                    BookTitle = d.Book?.BookName,
+                    Quantity = d.Quantity,
+                    TotalPrice = d.TotalPrice
+                }).ToList()
+            });
         }
 
         // Lấy đơn hàng theo ID
         public async Task<OrderResponse?> GetByIdAsync(int id)
         {
-            var o = await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.Payment)
-                .Include(o => o.OrdersDetails)
-                    .ThenInclude(d => d.Book)
-                .FirstOrDefaultAsync(o => o.OrdersId == id);
-
+            var o = await _orderRepository.GetOrderWithDetailsAsync(id);
             if (o == null) return null;
 
             return new OrderResponse
             {
                 OrdersId = o.OrdersId,
                 OrdersStatus = o.OrdersStatus,
-                UserName = o.User != null?$"{o.User.FirstName}{o.User.LastName}".Trim() :null,
+                UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
                 PaymentMethod = o.Payment?.MethodName,
                 CreateTime = o.CreateTime,
                 OrderDetails = o.OrdersDetails.Select(d => new OrderDetailResponse
                 {
                     BookId = d.BookId,
-                    BookTitle = d.Book.BookName,
+                    BookTitle = d.Book?.BookName,
                     Quantity = d.Quantity,
                     TotalPrice = d.TotalPrice
                 }).ToList()
@@ -84,12 +78,12 @@ namespace bookstore.Server.Services.implementations
                 CreateTime = DateTime.Now
             };
 
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync(); // lưu để có OrdersId
+            await _orderRepository.AddAsync(order);
+            await _orderRepository.SaveChangesAsync();
 
             foreach (var detail in request.OrderDetails)
             {
-                var orderDetail = new OrdersDetail
+                var od = new OrdersDetail
                 {
                     OrderId = order.OrdersId,
                     BookId = detail.BookId,
@@ -97,10 +91,9 @@ namespace bookstore.Server.Services.implementations
                     TotalPrice = detail.TotalPrice,
                     CreateTime = DateTime.Now
                 };
-                _context.OrdersDetails.Add(orderDetail);
+                await _orderDetailRepo.AddAsync(od);
             }
-
-            await _context.SaveChangesAsync();
+            await _orderDetailRepo.SaveChangesAsync();
 
             return await GetByIdAsync(order.OrdersId) ?? new OrderResponse();
         }
@@ -108,26 +101,26 @@ namespace bookstore.Server.Services.implementations
         // Cập nhật trạng thái
         public async Task<bool> UpdateStatusAsync(int id, string newStatus)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _orderRepository.GetByIdAsync(id);
             if (order == null) return false;
 
             order.OrdersStatus = newStatus;
-            await _context.SaveChangesAsync();
+            await _orderRepository.UpdateAsync(order);
+            await _orderRepository.SaveChangesAsync();
             return true;
         }
 
         // Xóa đơn hàng
         public async Task<bool> DeleteAsync(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrdersDetails)
-                .FirstOrDefaultAsync(o => o.OrdersId == id);
-
+            var order = await _orderRepository.GetOrderWithDetailsAsync(id);
             if (order == null) return false;
 
-            _context.OrdersDetails.RemoveRange(order.OrdersDetails);
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+            foreach (var d in order.OrdersDetails)
+                await _orderDetailRepo.DeleteAsync(d.OrderId);
+
+            await _orderRepository.DeleteAsync(id);
+            await _orderRepository.SaveChangesAsync();
             return true;
         }
     }
