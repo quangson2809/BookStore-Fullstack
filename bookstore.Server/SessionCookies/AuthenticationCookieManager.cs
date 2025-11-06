@@ -27,14 +27,33 @@ namespace bookstore.Server.SessionCookies
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 claimsPrincipal
                 );
-            Console.WriteLine("===============================set cookie " + user.FirstName + ":" + user.Role.RoleName);
+
+            var name = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value ?? "null";
+            var role = claimsPrincipal.FindFirst(ClaimTypes.Role)?.Value ?? "null";
+            Console.WriteLine("===============================set cookie " + name + ":::" + role);
 
         }
-        public int Get()
+        public async Task Get()
         {
-            throw new NotImplementedException();
+            var user = _httpContextAccessor.HttpContext.User;
+            if (user == null || !user.Identity.IsAuthenticated)
+            {
+                Console.WriteLine("User chưa xác thực");
+                return ;
+            }
+
+            // Lấy tên user
+            var userName = user.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
+
+            // Lấy role user
+            var role = user.FindFirst(ClaimTypes.Role)?.Value ?? "No Role";
+
+            var logMsg = $"User Name: {userName}, Role: {role}";
+
+            Console.WriteLine("===============================Get cookie info: " + logMsg);
+
         }
-        public async void Clear()
+        public async Task Clear()
         {
             await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             Console.WriteLine("===============================clear cookie done!");

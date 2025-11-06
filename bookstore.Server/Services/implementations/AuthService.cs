@@ -47,6 +47,8 @@ namespace bookstore.Server.Services.Implementations
                 await _authCookieManager.Set(user);
                 //
                 //int userId = _sessionManager.GetUserId();
+                await _authCookieManager.Get();
+
                 return new StatusResponse(true, "Đăng nhập thành công");
             }
 
@@ -77,7 +79,7 @@ namespace bookstore.Server.Services.Implementations
                     Phone = user.Phone,
                     CartId = user.Carts.Any<Cart>() ? user.Carts.First<Cart>().CartId : 0,
                 };
-                user.Orders.ToList().ForEach(o => response.OrderIds.Add(o.OrdersId));
+                user.Orders.ToList().ForEach(o => response.OrderIds.Add(o.OrderId));
                 return response;
             }
 
@@ -124,10 +126,16 @@ namespace bookstore.Server.Services.Implementations
 
         
 
-        public Task<bool> IsAuthenticatedAsync()
+        public async Task<StatusResponse> IsAuthenticatedAsync()
         {
             // Giả lập authentication, thực tế sẽ check JWT hoặc session
-            return Task.FromResult(true);
+            _authCookieManager.Clear();
+            _sessionManager.Clear();
+            return new StatusResponse
+            {
+                Success = true,
+                Message = "Đã đăng xuất"
+            };
         }
     }
 }
