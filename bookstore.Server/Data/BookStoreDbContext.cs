@@ -15,7 +15,7 @@ public partial class BookStoreDbContext : DbContext
         : base(options)
     {
     }
-    
+
 
     public virtual DbSet<Book> Books { get; set; }
 
@@ -37,7 +37,7 @@ public partial class BookStoreDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-   
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
@@ -53,7 +53,7 @@ public partial class BookStoreDbContext : DbContext
             entity.Property(e => e.BookName)
                 .HasMaxLength(200)
                 .HasColumnName("Book_Name");
-      
+
             entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
             entity.Property(e => e.Isbn)
                 .HasMaxLength(20)
@@ -70,7 +70,7 @@ public partial class BookStoreDbContext : DbContext
                 .HasDefaultValue(0)
                 .HasColumnName("Stock_Quantity");
 
-            
+
 
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
                 .HasForeignKey(d => d.CategoryId)
@@ -151,15 +151,18 @@ public partial class BookStoreDbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrdersId).HasName("PK__Orders__B2D3008CD2772431");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__B2D3008CD2772431");
 
-            entity.Property(e => e.OrdersId).HasColumnName("Orders_Id");
+            entity.Property(e => e.OrderId).HasColumnName("Orders_Id");
             entity.Property(e => e.OrdersStatus)
                 .HasMaxLength(50)
                 .HasColumnName("Orders_Status");
             entity.Property(e => e.PaymentId).HasColumnName("Payment_Id");
             entity.Property(e => e.UserId).HasColumnName("User_Id");
-
+            entity.Property(e => e.Phone).HasColumnName("Phone");
+            entity.Property(e => e.FullName).HasColumnName("FullName");
+            entity.Property(e => e.Address).HasColumnName("Address");
+            entity.Property(e => e.Email).HasColumnName("Email");
             entity.HasOne(d => d.Payment).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PaymentId)
                 .HasConstraintName("FK__Orders__Payment___47DBAE45");

@@ -28,24 +28,45 @@ namespace bookstore.Server.Controllers
         [HttpPost("customer/login")]
         public async Task<IActionResult> CustomerLogin([FromBody] CustomerLoginRequest request)
         {
-            var response = await _authService.CustomerLogin(request);
-            return Ok(response);
+            try
+            {
+                var response = await _authService.CustomerLogin(request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new StatusResponse(false, ex.Message));
+            }
         }
 
         [HttpPost("customer/signup")]
         public async Task<IActionResult> CustomerSignup([FromBody] CustomerSignupRequest request)
         {
-            var response = await _authService.CustomerSignup(request);
-            return Ok(response);
+            try
+            {
+                var response = await _authService.CustomerSignup(request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new StatusResponse(false, ex.Message));
+            }
         }
 
-        //[Authorize(Roles ="Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost("admin/dashboard")]
         public async Task<IActionResult> AccessDashboad()
         {
-            return Ok(new StatusResponse(true, " "));
+            Console.WriteLine("==========================Accessing admin dashboard");
+            return Ok(new {success = true});
         }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            // In a real application, you might want to handle token invalidation or session termination here.
+            var response = await _authService.IsAuthenticatedAsync();
+            return Ok(response);
 
-
+        }
     }
 }

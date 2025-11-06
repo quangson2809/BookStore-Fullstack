@@ -31,7 +31,7 @@ namespace bookstore.Server.Services.implementations
             // get extension of file
             string extension = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
             if(extension != ".jpg" && extension != ".jpeg" && extension != ".gif" && extension != ".png")
-                throw new Exception("File không hợp lệ");
+                throw new Exception("File không hợp lệ, phải là đuôi .jpg .gif .png .jpeg");
 
             // create unique file name
             var fileName = $"{Guid.NewGuid()}{extension}";

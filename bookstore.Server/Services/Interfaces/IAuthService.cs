@@ -9,7 +9,7 @@ namespace bookstore.Server.Services.Interfaces
         Task<CustomerLoginResponse> CustomerLogin(CustomerLoginRequest request);
         Task<StatusResponse> CustomerSignup(CustomerSignupRequest request);
 
-        Task<bool> IsAuthenticatedAsync();
+        Task<StatusResponse> IsAuthenticatedAsync();
 
     }
 }
