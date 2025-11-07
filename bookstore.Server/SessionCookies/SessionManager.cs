@@ -39,7 +39,7 @@ namespace bookstore.Server.SessionCookies
             Console.WriteLine("============================SetUserId" + ":" + user.UserId);
         }
 
-        public void Clear()
+        public async Task Clear()
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null || httpContext.Session == null)

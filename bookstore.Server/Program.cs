@@ -34,10 +34,19 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(20);// hết hán sau 20 phút 
     options.Cookie.HttpOnly = true;// ngăn chặn truy cập cookie từ phía client
     options.Cookie.IsEssential = true;// đảm bảo cookie được gửi ngay cả khi người dùng chưa đồng ý với chính sách cookie
-    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None;
     
 });
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromMinutes(20);
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//    // THAY ĐỔI Ở ĐÂY
+//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Yêu cầu HTTPS
+//    options.Cookie.SameSite = SameSiteMode.None; // Cho phép cross-origin
+//});
 
 //cookie authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -45,11 +54,24 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "BookStoreAuthCookie";
         options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.None;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(10);//expire time
+        options.LoginPath = "/api/Auth/admin/login";
     }
      );
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//        options.Cookie.Name = "BookStoreAuthCookie";
+//        options.Cookie.HttpOnly = true;
+//        // THAY ĐỔI Ở ĐÂY
+//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Yêu cầu HTTPS
+//        options.Cookie.SameSite = SameSiteMode.None; // Cho phép cross-origin
+//        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+//        options.LoginPath = "/api/Auth/admin/login";
+//    }
+//     );
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SessionManager>();
@@ -78,7 +100,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowViteClient", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:58837")
+        policy.WithOrigins("https://localhost:5173", "https://localhost:58837")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -104,6 +126,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
-
+app.UseHttpsRedirection();
 app.Run();
 

@@ -5,7 +5,7 @@ namespace bookstore.Server.Entities;
 
 public partial class Order
 {
-    public int OrdersId { get; set; }
+    public int OrderId { get; set; }
 
     public string? OrdersStatus { get; set; }
 

@@ -20,8 +20,15 @@ namespace bookstore.Server.Controllers
         [HttpPost("adding")]
         public async Task<IActionResult> AddBook([FromForm] BookAddRequest request, [FromForm] List<IFormFile> Images)
         {
-            var response = await _bookService.AddBook(request,Images);
-            return Ok(response);
+            try
+            {
+                var response = await _bookService.AddBook(request, Images);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new StatusResponse(false, ex.Message));
+            }
         }
 
         [HttpGet("book/{id}")]
@@ -57,8 +64,15 @@ namespace bookstore.Server.Controllers
         [HttpPatch("updating/{Id}")]
         public async Task<IActionResult> UpdateBook([FromRoute] int Id, [FromForm] BookUpdateRequest request, [FromForm] List<IFormFile> Images)
         {
-            var response = await _bookService.UpdateBook(Id,request, Images);
-            return Ok(response);
+            try
+            {
+                var response = await _bookService.UpdateBook(Id, request, Images);
+                return Ok(response);
+            }
+            catch (Exception ex) 
+            {
+                return Ok(new StatusResponse(false, ex.Message));
+            }
         }
 
     }
