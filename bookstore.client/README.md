@@ -152,3 +152,102 @@ curl -X POST "http://localhost:5121/api/book/adding" ^
   -F "ImageUrlsExit[]=http://localhost:5121/images/old1.jpg"^
   -F "ImageUrlsExit[]=http://localhost:5121/images/old2.jpg"^
   -F "Images=@\"C:\Users\Admin\Downloads\Xác thực_m2.jpg\""
+
+
+  -http://localhost:5121/api/order/orders
+  -http://localhost:5121/api/order/order/1
+  -http://localhost:5121/api/order/adding
+  -http://localhost:5121/api/order/updating/1
+  -http://localhost:5121/api/order/deleting/1
+
+  test:
+& "C:\Windows\System32\curl.exe" -X GET http://localhost:5121/api/order/orders
+>>
+{"success":true,"message":"Lấy danh sách đơn hàng thành công.","data":[{"ordersId":1
+,"ordersStatus":null,"userName":null,"paymentMethod":null,"createTime":null,"fullName":null
+,"phone":null,"address":null,"email":null,"orderDetails":[]}]}
+
+PS C:\Users\Admin> (Invoke-WebRequest -Uri "http://localhost:5121/api/order/order/1" -Method GET).Content
+>>
+{"success":true,"message":"Lấy đơn hàng thành công.","data":{"ordersId":1,"ordersStatus":null
+,"userName":"Sẹo đời","paymentMethod":null,"createTime":null,"fullName":null,"phone":null
+,"address":null,"email":null,"orderDetails":[{"bookId":1,"bookTitle":"Sách mới","quantity":1
+,"totalPrice":270000.00},{"bookId":5,"bookTitle":"Giáo trình Lập trình C#","quantity":1,"totalPrice":750000.00}]}}
+
+PS C:\Users\Admin> Invoke-WebRequest -Uri "http://localhost:5121/api/order/adding" `
+>>   -Method POST `
+>>   -ContentType "application/json" `
+>>   -Body '{"userId":1,"paymentId":null,"ordersStatus":"Cho xac nhan","orderDetails":[{"bookId":1,"quantity":1,"totalPrice":150000.0}],"fullName":"Nguyen Van A","phone":"0123456789","address":"HN","email":"vana@example.com"}'
+>>
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"success":true,"message":"Tạo đơn hàng thành công.","data":{"ordersId":5,"ordersStatus":"Cho xac
+                    nhan","userName":"Nguyen Van
+                    A","paymentMethod":null,"createTime":"2025-11-07T16:03:19.5174024+07:00",...
+RawContent        : HTTP/1.1 200 OK
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json; charset=utf-8
+                    Date: Fri, 07 Nov 2025 09:03:20 GMT
+                    Server: Kestrel
+
+                    {"success":true,"message":"Tạo đơn hàng thành công."...
+Forms             : {}
+Headers           : {[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Fri, 07 Nov
+                    2025 09:03:20 GMT], [Server, Kestrel]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 356
+
+
+PS C:\Users\Admin> Invoke-WebRequest -Uri "http://localhost:5121/api/order/updating/1" `                                >>   -Method PUT `
+>>   -ContentType "application/json" `
+>>   -Body '"Dang giao hang"'
+>>
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"success":true,"message":"Cập nhật đơn hàng thành công"}
+RawContent        : HTTP/1.1 200 OK
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json; charset=utf-8
+                    Date: Fri, 07 Nov 2025 09:15:12 GMT
+                    Server: Kestrel
+
+                    {"success":true,"message":"Cập nhật đơn hàng thành c...
+Forms             : {}
+Headers           : {[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Fri, 07 Nov
+                    2025 09:15:12 GMT], [Server, Kestrel]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 66
+
+
+
+PS C:\Users\Admin> Invoke-WebRequest -Uri "http://localhost:5121/api/order/deleting/1" -Method DELETE                   >>
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"success":true,"message":"Đã xóa đơn hàng thành công"}
+RawContent        : HTTP/1.1 200 OK
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json; charset=utf-8
+                    Date: Fri, 07 Nov 2025 09:52:21 GMT
+                    Server: Kestrel
+
+                    {"success":true,"message":"Đã xóa đơn hàng thành côn...
+Forms             : {}
+Headers           : {[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Fri, 07 Nov
+                    2025 09:52:21 GMT], [Server, Kestrel]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 63
