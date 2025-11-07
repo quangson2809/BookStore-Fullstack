@@ -18,7 +18,6 @@ public partial class Order
     public string? Phone { get; set; }
     public string? Address { get; set; }
     public string? Email { get; set; }
-    public string? Note { get; set; }
     public virtual ICollection<OrdersDetail> OrdersDetails { get; set; } = new List<OrdersDetail>();
 
     public virtual Payment? Payment { get; set; }

@@ -148,6 +148,7 @@ namespace bookstore.Server.Services.implementations
         // Cập nhật trạng thái
         public async Task<bool> UpdateStatusAsync(int id, string newStatus)
         {
+            Console.WriteLine($"[DEBUG] Body nhận: {newStatus ?? "null"}");
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null) throw new Exception("Không tìm thấy đơn hàng!");
 
@@ -160,15 +161,19 @@ namespace bookstore.Server.Services.implementations
         // Xóa đơn hàng
         public async Task<bool> DeleteAsync(int id)
         {
+            Console.WriteLine($"[DEBUG] Bắt đầu xóa đơn hàng {id}");
             var order = await _orderRepository.GetOrderWithDetailsAsync(id);
-            if (order == null) throw new Exception("Không tìm thấy đơn hàng!");
+            if (order == null)
+                throw new Exception("Không tìm thấy đơn hàng!");
 
-            foreach (var d in order.OrdersDetails)
-                await _orderDetailRepo.DeleteAsync(d.OrderId);
+            await _orderRepository.DeleteOrderAndDetailsAsync(id);
+            Console.WriteLine($"[DEBUG] Xóa đơn hàng {id} và chi tiết thành công");
 
-            await _orderRepository.DeleteAsync(id);
-            await _orderRepository.SaveChangesAsync();
             return true;
         }
+
+
+
+
     }
 }

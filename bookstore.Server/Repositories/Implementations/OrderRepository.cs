@@ -29,5 +29,22 @@ namespace bookstore.Server.Repositories.Implementations
                     .ThenInclude(d => d.Book)
                 .FirstOrDefaultAsync(o => o.OrdersId == orderId);
         }
+        public async Task ExecuteSqlRawAsync(string sql)
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(sql);
+        }
+        public async Task<bool> DeleteOrderAndDetailsAsync(int orderId)
+        {
+            // Xóa chi tiết đơn hàng trước
+            var sqlDeleteDetails = $"DELETE FROM OrdersDetail WHERE Order_Id = {orderId}";
+            await _dbContext.Database.ExecuteSqlRawAsync(sqlDeleteDetails);
+
+            // Sau đó xóa đơn hàng chính
+            var sqlDeleteOrder = $"DELETE FROM Orders WHERE Orders_Id = {orderId}";
+            await _dbContext.Database.ExecuteSqlRawAsync(sqlDeleteOrder);
+
+            return true;
+        }
+
     }
 }

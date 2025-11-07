@@ -20,7 +20,7 @@ namespace bookstore.Server.Controllers
             _orderService = orderService;
         }
         // Lấy tất cả đơn hàng
-        [HttpGet]
+        [HttpGet("orders")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -40,7 +40,7 @@ namespace bookstore.Server.Controllers
         }
 
         // Lấy đơn hàng theo ID
-        [HttpGet("{id}")]
+        [HttpGet("order/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
@@ -64,11 +64,12 @@ namespace bookstore.Server.Controllers
         }
 
         // Tạo đơn hàng mới
-        [HttpPost]
+        [HttpPost("adding")]
         public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
         {
             try
             {
+
                 var result = await _orderService.CreateAsync(request);
                 return Ok(new
                 {
@@ -85,7 +86,7 @@ namespace bookstore.Server.Controllers
 
 
         // Cập nhật trạng thái đơn hàng
-        [HttpPut("{id}")]
+        [HttpPut("updating/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string newStatus)
         {
             try {
@@ -101,7 +102,7 @@ namespace bookstore.Server.Controllers
 
 
         // Xóa đơn hàng
-        [HttpDelete("{id}")]
+        [HttpDelete("deleting/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try

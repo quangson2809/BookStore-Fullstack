@@ -6,5 +6,9 @@ namespace bookstore.Server.Repositories.Interfaces
     {
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId);
         Task<Order?> GetOrderWithDetailsAsync(int orderId);
+        Task ExecuteSqlRawAsync(string sql);
+        Task<bool> DeleteOrderAndDetailsAsync(int orderId);
+
+
     }
 }
