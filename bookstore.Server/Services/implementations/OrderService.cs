@@ -34,7 +34,7 @@ namespace bookstore.Server.Services.implementations
                 throw new Exception("Không có đơn hàng nào!");
             return orders.Select(o => new OrderResponse
             {
-                OrdersId = o.OrdersId,
+                OrdersId = o.OrderId,
                 OrdersStatus = o.OrdersStatus,
                 UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
                 PaymentMethod = o.Payment?.MethodName,
@@ -57,7 +57,7 @@ namespace bookstore.Server.Services.implementations
 
             return new OrderResponse
             {
-                OrdersId = o.OrdersId,
+                OrdersId = o.OrderId,
                 OrdersStatus = o.OrdersStatus,
                 UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
                 PaymentMethod = o.Payment?.MethodName,
@@ -103,7 +103,7 @@ namespace bookstore.Server.Services.implementations
             {
                 var od = new OrdersDetail
                 {
-                    OrderId = order.OrdersId,
+                    OrderId = order.OrderId,
                     BookId = detail.BookId,
                     Quantity = detail.Quantity,
                     TotalPrice = detail.TotalPrice,
@@ -125,13 +125,13 @@ namespace bookstore.Server.Services.implementations
             await _bookRepo.SaveChangesAsync();
 
             // Lấy lại đơn hàng đã tạo
-            var createdOrder = await _orderRepository.GetOrderWithDetailsAsync(order.OrdersId);
+            var createdOrder = await _orderRepository.GetOrderWithDetailsAsync(order.OrderId);
             if (createdOrder == null)
                 throw new Exception("Không thể lấy lại đơn hàng sau khi tạo.");
 
             return new OrderResponse
             {
-                OrdersId = createdOrder.OrdersId,
+                OrdersId = createdOrder.OrderId,
                 OrdersStatus = createdOrder.OrdersStatus,
                 UserName = createdOrder.FullName,
                 PaymentMethod = createdOrder.Payment?.MethodName,

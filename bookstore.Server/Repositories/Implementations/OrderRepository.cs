@@ -27,7 +27,7 @@ namespace bookstore.Server.Repositories.Implementations
                 .Include(o => o.Payment)
                 .Include(o => o.OrdersDetails)
                     .ThenInclude(d => d.Book)
-                .FirstOrDefaultAsync(o => o.OrdersId == orderId);
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
         public async Task ExecuteSqlRawAsync(string sql)
         {
