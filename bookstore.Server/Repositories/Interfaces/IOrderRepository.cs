@@ -4,11 +4,7 @@ namespace bookstore.Server.Repositories.Interfaces
 {
     public interface IOrderRepository : IGenericRepository<Order>
     {
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId);
-        Task<Order?> GetOrderWithDetailsAsync(int orderId);
-        Task ExecuteSqlRawAsync(string sql);
-        Task<bool> DeleteOrderAndDetailsAsync(int orderId);
-
-
+        Task<IEnumerable<Order>> GetOrdersByUserId(int userId);
+        Task UpdateStatus(int orderId);
     }
 }

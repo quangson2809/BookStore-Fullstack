@@ -19,102 +19,66 @@ namespace bookstore.Server.Controllers
         {
             _orderService = orderService;
         }
+
         // Lấy tất cả đơn hàng
         [HttpGet("orders")]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _orderService.GetAllAsync();
-                return Ok(new
-                {
-                    success = true,
-                    message = "Lấy danh sách đơn hàng thành công.",
-                    data = result
-                });
+                var responses = await _orderService.GetAll();
+                return Ok(responses);
             }
             catch (Exception ex)
             {
-                return BadRequest(new StatusResponse(false, ex.Message));
+                return Ok(new StatusResponse(false, ex.Message));
             }
         }
 
         // Lấy đơn hàng theo ID
-        [HttpGet("order/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{UserId}")]
+        public async Task<IActionResult> GetByUserId([FromRoute] int UserId)
         {
             try
             {
-                var result = await _orderService.GetByIdAsync(id);
-                if (result == null)
-                    return NotFound(new { message = "Không tìm thấy đơn hàng!" });
-                return Ok(new
-                {
-                    success = true,
-                    message = "Lấy đơn hàng thành công.",
-                    data = result
-                });
+                var responses = await _orderService.GetByUserId(UserId);
+                return Ok(responses);
             }
             catch (Exception ex)
             {
-                return BadRequest(new StatusResponse(false, ex.Message));
+                return Ok(new StatusResponse(false, ex.Message));
             }
         }
 
         // Tạo đơn hàng mới
-        [HttpPost("adding")]
-        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
+        [HttpPost("Create/{CartId}")]
+        public async Task<IActionResult> Create([FromRoute] int CartId, [FromBody] OrderCreateRequest request)
         {
             try
             {
-
-                var result = await _orderService.CreateAsync(request);
-                return Ok(new
-                {
-                    success = true,
-                    message = "Tạo đơn hàng thành công.",
-                    data = result
-                });
+                var response = await _orderService.CreateAsync(CartId,request);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new StatusResponse(false, ex.Message));
+                return Ok(new StatusResponse(false, ex.Message));
             }
         }
 
 
         // Cập nhật trạng thái đơn hàng
-        [HttpPut("updating/{id}")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] string newStatus)
+        [HttpPatch("Confirm/{OrderId}")]
+        public async Task<IActionResult> UpdateStatus(int OrderId)
         {
             try {
-                var success = await _orderService.UpdateStatusAsync(id, newStatus);
-                if (!success) return NotFound(new { message = "Không tìm thấy đơn hàng!" });
-                return Ok(new StatusResponse(true, "Cập nhật đơn hàng thành công"));
+                var response = await _orderService.UpdateStatusAsync(OrderId);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new StatusResponse(false, ex.Message));
+                return Ok(new StatusResponse(false, ex.Message));
             }
         }
 
-
-        // Xóa đơn hàng
-        [HttpDelete("deleting/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var success = await _orderService.DeleteAsync(id);
-                if (!success) return NotFound(new { message = "Không tìm thấy đơn hàng!" });
-                return Ok(new StatusResponse(true, "Đã xóa đơn hàng thành công"));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new StatusResponse(false, ex.Message));
-            }
-        }
     }
 }

@@ -10,9 +10,9 @@ namespace bookstore.Server.Repositories.Implementations
         {
 
         }
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(int userId)
+        public async Task<IEnumerable<Order>> GetOrdersByUserId(int userId)
         {
-            return await _dbContext.Orders
+            return await _table
                 .Where(o => o.UserId == userId)
                 .Include(o => o.Payment)
                 .Include(o => o.OrdersDetails)
@@ -20,30 +20,22 @@ namespace bookstore.Server.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<Order?> GetOrderWithDetailsAsync(int orderId)
+        public async Task<IEnumerable<Order>> GetAllAsync()
         {
-            return await _dbContext.Orders
+            return await _table
                 .Include(o => o.User)
                 .Include(o => o.Payment)
                 .Include(o => o.OrdersDetails)
                     .ThenInclude(d => d.Book)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+                .ToListAsync();
         }
-        public async Task ExecuteSqlRawAsync(string sql)
-        {
-            await _dbContext.Database.ExecuteSqlRawAsync(sql);
-        }
-        public async Task<bool> DeleteOrderAndDetailsAsync(int orderId)
-        {
-            // Xóa chi tiết đơn hàng trước
-            var sqlDeleteDetails = $"DELETE FROM OrdersDetail WHERE Order_Id = {orderId}";
-            await _dbContext.Database.ExecuteSqlRawAsync(sqlDeleteDetails);
 
-            // Sau đó xóa đơn hàng chính
-            var sqlDeleteOrder = $"DELETE FROM Orders WHERE Orders_Id = {orderId}";
-            await _dbContext.Database.ExecuteSqlRawAsync(sqlDeleteOrder);
-
-            return true;
+        public async Task UpdateStatus(int orderId)
+        {
+            await _table
+                .Where(o => o.OrderId == orderId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(o => o.OrdersStatus, "Done"));
         }
 
     }

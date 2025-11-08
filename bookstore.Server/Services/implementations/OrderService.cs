@@ -14,166 +14,139 @@ namespace bookstore.Server.Services.implementations
     {
         // Implement invoice-related methods here
         private readonly IOrderRepository _orderRepository;
-        private readonly IGenericRepository<OrdersDetail> _orderDetailRepo;
-        private readonly IGenericRepository<Book> _bookRepo;
+        private readonly ICartRepository _cartRepository;
 
+        private int _currentCartId;
         public OrderService(
             IOrderRepository orderRepository,
-            IGenericRepository<OrdersDetail> orderDetailRepo,
-            IGenericRepository<Book> bookRepo)
+            ICartRepository cartRepository)
         {
             _orderRepository = orderRepository;
-            _orderDetailRepo = orderDetailRepo;
-            _bookRepo = bookRepo;
-        }
-        //Lấy tat cả đơn hàng
-        public async Task<IEnumerable<OrderResponse>> GetAllAsync()
-        {
-            var orders = await _orderRepository.GetAllAsync();
-            if (orders == null || !orders.Any())
-                throw new Exception("Không có đơn hàng nào!");
-            return orders.Select(o => new OrderResponse
-            {
-                OrdersId = o.OrderId,
-                OrdersStatus = o.OrdersStatus,
-                UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
-                PaymentMethod = o.Payment?.MethodName,
-                CreateTime = o.CreateTime,
-                OrderDetails = o.OrdersDetails.Select(d => new OrderDetailResponse
-                {
-                    BookId = d.BookId,
-                    BookTitle = d.Book?.BookName,
-                    Quantity = d.Quantity,
-                    TotalPrice = d.TotalPrice
-                }).ToList()
-            });
+            _cartRepository = cartRepository;
         }
 
-        // Lấy đơn hàng theo ID
-        public async Task<OrderResponse?> GetByIdAsync(int id)
+        public async Task<StatusResponse> CreateAsync(int CartId, OrderCreateRequest Request)
         {
-            var o = await _orderRepository.GetOrderWithDetailsAsync(id);
-            if (o == null) throw new Exception("Không tìm thấy đơn hàng!");
-
-            return new OrderResponse
+            Cart cart =  await _cartRepository.GetByIdAsync(CartId);
+            if (cart == null || cart.CartDetails == null || cart.CartDetails.Count ==0)
             {
-                OrdersId = o.OrderId,
-                OrdersStatus = o.OrdersStatus,
-                UserName = o.User != null ? $"{o.User.FirstName}{o.User.LastName}".Trim() : null,
-                PaymentMethod = o.Payment?.MethodName,
-                CreateTime = o.CreateTime,
-                OrderDetails = o.OrdersDetails.Select(d => new OrderDetailResponse
-                {
-                    BookId = d.BookId,
-                    BookTitle = d.Book?.BookName,
-                    Quantity = d.Quantity,
-                    TotalPrice = d.TotalPrice
-                }).ToList()
-            };
-        }
-
-        // Tạo đơn hàng mới
-        public async Task<OrderResponse> CreateAsync(CreateOrderRequest request)
-        {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
-
-            var order = new Order
+                throw new Exception("Giỏ hàng trống!");
+            }
+            
+            Order order = new Order
             {
-                UserId = request.UserId,
-                PaymentId = request.PaymentId,
-                OrdersStatus = request.OrdersStatus ?? "Pending",
+                UserId = cart.UserId,
                 CreateTime = DateTime.Now,
-
-                //  lưu thông tin khách hàng
-                FullName = request.FullName,
-                Phone = request.Phone,
-                Address = request.Address,
-                Email = request.Email
+                FullName = Request.FullName,
+                Phone = Request.Phone,
+                Address = Request.Address,
+                Email = Request.Email,
+                OrdersStatus = "Pending",
+                OrdersDetails = new List<OrdersDetail>(),
             };
-
+            foreach( CartDetail cd in cart.CartDetails)
+            {
+                if (cd.Quantity > cd.Book.StockQuantity)
+                    throw new Exception($"{cd.Book.BookName}số lượng trong kho còn {cd.Book.StockQuantity}");
+                OrdersDetail od = new OrdersDetail
+                {
+                    BookId = cd.BookId,
+                    Quantity = cd.Quantity,
+                    Order = order
+                };
+                cd.Book.StockQuantity -= cd.Quantity;
+                order.OrdersDetails.Add(od);
+            }
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
+            return new StatusResponse(true, "Đặt hàng thành công");
+        }
 
-            // Thêm chi tiết đơn hàng
-            if (request.OrderDetails == null || !request.OrderDetails.Any())
-                throw new Exception("Đơn hàng không có chi tiết sản phẩm nào.");
-
-            foreach (var detail in request.OrderDetails)
+        public async Task<IEnumerable<OrdersOverviewDashBoardResponse>> GetAll()
+        {
+            List<OrdersOverviewDashBoardResponse> result = new List<OrdersOverviewDashBoardResponse>();
+            foreach(Order order in await _orderRepository.GetAllAsync())
             {
-                var od = new OrdersDetail
+                OrdersOverviewDashBoardResponse orp = new OrdersOverviewDashBoardResponse
                 {
-                    OrderId = order.OrderId,
-                    BookId = detail.BookId,
-                    Quantity = detail.Quantity,
-                    TotalPrice = detail.TotalPrice,
-                    CreateTime = DateTime.Now
+                    OrdersId = order.OrderId,
+                    OrdersStatus = order.OrdersStatus,
+                    FullName = $"{order.User.FirstName}{order.User.LastName}" ?? " null",
+                    CreateTime = order.CreateTime,
+                    ToalPrice = 0,
                 };
-                await _orderDetailRepo.AddAsync(od);
-
-                //  Trừ hàng tồn
-                var book = await _bookRepo.GetByIdAsync(detail.BookId);
-                if (book == null)
-                    throw new Exception($"Không tìm thấy sách ID = {detail.BookId}");
-                if (book.StockQuantity < detail.Quantity)
-                    throw new Exception($"Sách '{book.BookName}' không đủ hàng tồn!");
-                book.StockQuantity -= detail.Quantity;
-                await _bookRepo.UpdateAsync(book);
+                foreach( OrdersDetail od in order.OrdersDetails)
+                {
+                    if( od.Book != null)
+                    {
+                        orp.Booknames.Add( od.Book.BookName);
+                    }
+                    orp.ToalPrice += (int)(od.Book.SalePrice*od.Quantity);
+                }
+                result.Add(orp);
             }
 
-            await _orderDetailRepo.SaveChangesAsync();
-            await _bookRepo.SaveChangesAsync();
+            return result;
+        }
 
-            // Lấy lại đơn hàng đã tạo
-            var createdOrder = await _orderRepository.GetOrderWithDetailsAsync(order.OrderId);
-            if (createdOrder == null)
-                throw new Exception("Không thể lấy lại đơn hàng sau khi tạo.");
+        public Task<OrderResponse?> GetByOrderId(int OrderId)
+        {
+            throw new NotImplementedException();
+        }
 
-            return new OrderResponse
+        public async Task<IEnumerable<OrderResponse>> GetByUserId(int UserId)
+        {
+            List<Order> orders = (List<Order>)await _orderRepository.GetOrdersByUserId(UserId);
+            if( orders == null || orders.Count ==0)
+                throw new Exception("Không tìm thấy đơn hàng nào!");
+
+            List<OrderResponse> result = new List<OrderResponse>();
+
+            foreach( Order order in orders)
             {
-                OrdersId = createdOrder.OrderId,
-                OrdersStatus = createdOrder.OrdersStatus,
-                UserName = createdOrder.FullName,
-                PaymentMethod = createdOrder.Payment?.MethodName,
-                CreateTime = createdOrder.CreateTime,
-                OrderDetails = createdOrder.OrdersDetails.Select(d => new OrderDetailResponse
+                OrderResponse orp = new OrderResponse
                 {
-                    BookId = d.BookId,
-                    BookTitle = d.Book?.BookName,
-                    Quantity = d.Quantity,
-                    TotalPrice = d.TotalPrice
-                }).ToList()
-            };
-        }
-        // Cập nhật trạng thái
-        public async Task<bool> UpdateStatusAsync(int id, string newStatus)
-        {
-            Console.WriteLine($"[DEBUG] Body nhận: {newStatus ?? "null"}");
-            var order = await _orderRepository.GetByIdAsync(id);
-            if (order == null) throw new Exception("Không tìm thấy đơn hàng!");
+                    OrdersId = order.OrderId,
+                    OrdersStatus = order.OrdersStatus,
+                    CreateTime =  order.CreateTime,
+                    FullName = order.FullName ?? " không",
+                    Phone = order.Phone ?? " không",
+                    Address = order.Address ?? " không",
+                    Email = order.Email ?? " không",
+                    ToalPrice = 0,
+                };
+                foreach( OrdersDetail od in order.OrdersDetails)
+                {
+                    OrderDetailResponse odr = new OrderDetailResponse
+                    {
+                        Id = od.BookId,
+                        Name = od.Book.BookName ,
+                        Quantity = od.Quantity,
+                        TotalPrice =(int)od.Book.SalePrice * od.Quantity,
+                    };
+                    orp.OrderDetails!.Add(odr);
+                    orp.ToalPrice += (int)(odr.TotalPrice );
+                    foreach( var bi in od.Book.BookImages)
+                    {
+                        odr.ImageLink = bi.BookImageUrl;
+                        break;
+                    }
+                }
+                result.Add(orp);
+            }
 
-            order.OrdersStatus = newStatus;
-            await _orderRepository.UpdateAsync(order);
-            await _orderRepository.SaveChangesAsync();
-            return true;
+            return result;
         }
 
-        // Xóa đơn hàng
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<StatusResponse> UpdateStatusAsync(int OrderId)
         {
-            Console.WriteLine($"[DEBUG] Bắt đầu xóa đơn hàng {id}");
-            var order = await _orderRepository.GetOrderWithDetailsAsync(id);
-            if (order == null)
+            Order order = await _orderRepository.GetByIdAsync(OrderId);
+            if(order == null ) 
                 throw new Exception("Không tìm thấy đơn hàng!");
+            await _orderRepository.UpdateStatus(OrderId);
+            await _orderRepository.SaveChangesAsync();
 
-            await _orderRepository.DeleteOrderAndDetailsAsync(id);
-            Console.WriteLine($"[DEBUG] Xóa đơn hàng {id} và chi tiết thành công");
-
-            return true;
+            return new StatusResponse(true, "Đẫ xác nhận");
         }
-
-
-
-
     }
 }
