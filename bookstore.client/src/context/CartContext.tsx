@@ -28,7 +28,7 @@ const CartContext = createContext<{
   updateQuantity: (bookId: number, quantity: number) => Promise<void>;
   clearCart: () => void;
   loadCart: () => Promise<void>;
-  resetCart: () => void; // NEW: Complete cart reset
+  resetCart: () => void;
 } | undefined>(undefined);
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -191,7 +191,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'CLEAR_CART' });
   };
 
-  // NEW: Complete cart reset for logout
   const resetCart = () => {
     dispatch({ type: 'RESET_ALL' });
   };
@@ -214,9 +213,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+    const context = useContext(CartContext);
+    if (!context) {
+        throw new Error('useCart must be used within a CartProvider');
+    }
+    return context;
 };

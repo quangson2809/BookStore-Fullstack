@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:58837",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\Admin\\source\\repos\\BookstoreTest\\bookstore.Server\\..\\bookstore.client",
+"WorkingDirectory": "C:\\Users\\ADMIN\\source\\repos\\BookStore-Fullstack\\bookstore.Server\\..\\bookstore.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }

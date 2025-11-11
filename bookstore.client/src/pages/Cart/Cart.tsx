@@ -1,46 +1,58 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { orderService, OrderDetailResponse } from '@/services/orderService';
 import CheckoutModal, { ShippingInfo } from '@/components/CheckoutModal';
 import './Cart.css';
 
 type TabType = 'cart' | 'pending' | 'completed';
 
-interface OrderItem {
-    title: string;
-    author: string;
-    quantity: number;
-    price: number;
-    imageUrl: string;
-}
-
-interface Order {
-    id: string;
-    items: OrderItem[];
-    total: number;
-    status: string;
-    orderDate: string;
-    estimatedDelivery?: string;
-    deliveredDate?: string;
-    shippingInfo?: ShippingInfo;
-}
-
 const Cart: React.FC = () => {
-    const { state, removeFromCart, updateQuantity, clearCart, loadCart } = useCart();
+    const { state, removeFromCart, updateQuantity, loadCart, resetCart } = useCart();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('cart');
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+    
+    const [pendingOrders, setPendingOrders] = useState<OrderDetailResponse[]>([]);
+    const [completedOrders, setCompletedOrders] = useState<OrderDetailResponse[]>([]);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
-    // Mock orders (sẽ được thay thế bằng API sau)
-    const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
-    const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
-
-    // Load cart on mount
     useEffect(() => {
         if (state.cartId) {
             loadCart();
         }
-    }, []);
+    }, [state.cartId]);
+
+    useEffect(() => {
+        if (activeTab === 'pending' || activeTab === 'completed') {
+            loadOrders();
+        }
+    }, [activeTab]);
+
+    const loadOrders = async () => {
+        const userInfo = localStorage.getItem('userInfo');
+        if (!userInfo) return;
+
+        try {
+            setIsLoadingOrders(true);
+            const user = JSON.parse(userInfo);
+            const orders = await orderService.getOrdersByUserId(user.userId);
+            
+            const pending = orders.filter(order => 
+                order.ordersStatus === 'Pending' || order.ordersStatus === 'shipping'
+            );
+            const completed = orders.filter(order => 
+                order.ordersStatus === 'Done' || order.ordersStatus === 'completed'
+            );
+            
+            setPendingOrders(pending);
+            setCompletedOrders(completed);
+        } catch (error) {
+            console.error('Error loading orders:', error);
+        } finally {
+            setIsLoadingOrders(false);
+        }
+    };
 
     const handleCheckout = () => {
         if (state.items.length === 0) {
@@ -50,57 +62,36 @@ const Cart: React.FC = () => {
         setIsCheckoutModalOpen(true);
     };
 
-    const handleConfirmCheckout = (shippingInfo: ShippingInfo) => {
-        const newOrderId = `DH${String(Date.now()).slice(-6)}`;
-        const newOrder: Order = {
-            id: newOrderId,
-            items: state.items.map(item => ({
-                title: item.book.title,
-                author: item.book.author,
-                quantity: item.quantity,
-                price: item.book.price,
-                imageUrl: item.book.imageUrl
-            })),
-            total: state.total,
-            status: 'shipping',
-            orderDate: new Date().toISOString().split('T')[0],
-            estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            shippingInfo
-        };
-
-        setPendingOrders(prev => [newOrder, ...prev]);
-        clearCart();
-        setIsCheckoutModalOpen(false);
-        alert(`Đặt hàng thành công! Mã đơn hàng: ${newOrderId}`);
+    const handleConfirmCheckout = async (_shippingInfo: ShippingInfo) => {
+        resetCart();
         
-        setTimeout(() => {
-            setActiveTab('pending');
-        }, 500);
+        if (state.cartId) {
+            await loadCart();
+        }
+        
+        setActiveTab('pending');
+        await loadOrders();
     };
 
-    const handleConfirmDelivery = (orderId: string) => {
-        if (window.confirm(`Bạn có chắc chắn đã nhận được đơn hàng ${orderId}?`)) {
-            const orderToMove = pendingOrders.find(order => order.id === orderId);
-            
-            if (orderToMove) {
-                const completedOrder: Order = {
-                    ...orderToMove,
-                    status: 'completed',
-                    deliveredDate: new Date().toISOString().split('T')[0]
-                };
-
-                setPendingOrders(prev => prev.filter(order => order.id !== orderId));
-                setCompletedOrders(prev => [completedOrder, ...prev]);
-                alert(`Đơn hàng ${orderId} đã được xác nhận giao thành công!`);
-
+    const handleConfirmDelivery = async (orderId: number) => {
+        if (window.confirm(`Bạn có chắc chắn đã nhận được đơn hàng #${orderId}?`)) {
+            try {
+                await orderService.confirmOrder(orderId);
+                
+                alert(`Đơn hàng #${orderId} đã được xác nhận giao thành công!`);
+                
+                await loadOrders();
+                
                 setTimeout(() => {
                     setActiveTab('completed');
-                }, 1000);
+                }, 500);
+            } catch (error) {
+                console.error('Error confirming delivery:', error);
+                alert('Có lỗi xảy ra khi xác nhận đơn hàng. Vui lòng thử lại.');
             }
         }
     };
 
-    // Render Giỏ hàng
     const renderCartTab = () => {
         if (state.isLoading) {
             return (
@@ -150,9 +141,9 @@ const Cart: React.FC = () => {
                             <img src={item.book.imageUrl} alt={item.book.title} className="cart-item-image" />
 
                             <div className="cart-item-details">
-                                <h3>{item.book.title}</h3>
+                                <h3>{item.book.title || item.book.name}</h3>
                                 <p>Tác giả: {item.book.author}</p>
-                                <p className="item-price">{item.book.price.toLocaleString('vi-VN')}đ</p>
+                                <p className="item-price">{(item.book.price || item.book.salePrice || 0).toLocaleString('vi-VN')}đ</p>
                             </div>
 
                             <div className="cart-item-controls">
@@ -184,7 +175,7 @@ const Cart: React.FC = () => {
                             </div>
 
                             <div className="item-total">
-                                {(item.book.price * item.quantity).toLocaleString('vi-VN')}đ
+                                {((item.book.price || item.book.salePrice || 0) * item.quantity).toLocaleString('vi-VN')}đ
                             </div>
                         </div>
                     ))}
@@ -221,8 +212,15 @@ const Cart: React.FC = () => {
         );
     };
 
-    // Render Đơn hàng chờ giao
     const renderPendingTab = () => {
+        if (isLoadingOrders) {
+            return (
+                <div className="empty-state">
+                    <p>Đang tải đơn hàng...</p>
+                </div>
+            );
+        }
+
         if (pendingOrders.length === 0) {
             return (
                 <div className="empty-state">
@@ -243,26 +241,31 @@ const Cart: React.FC = () => {
         return (
             <div className="orders-list">
                 {pendingOrders.map((order) => (
-                    <div key={order.id} className="order-card">
+                    <div key={order.ordersId} className="order-card">
                         <div className="order-header">
                             <div className="order-info">
-                                <span className="order-id">Mã đơn: {order.id}</span>
-                                <span className="order-date">Ngày đặt: {new Date(order.orderDate).toLocaleDateString('vi-VN')}</span>
+                                <span className="order-id">Mã đơn: #{order.ordersId}</span>
+                                <span className="order-date">
+                                    Ngày đặt: {order.createTime ? new Date(order.createTime).toLocaleDateString('vi-VN') : 'N/A'}
+                                </span>
                             </div>
                             <span className="status-badge shipping">Đang giao hàng</span>
                         </div>
 
                         <div className="order-items">
-                            {order.items.map((item, index) => (
-                                <div key={index} className="order-item">
-                                    <img src={item.imageUrl} alt={item.title} className="order-item-image" />
+                            {order.orderDetails?.map((item) => (
+                                <div key={item.id} className="order-item">
+                                    <img 
+                                        src={item.imageLink || 'https://via.placeholder.com/60'} 
+                                        alt={item.name} 
+                                        className="order-item-image" 
+                                    />
                                     <div className="order-item-details">
-                                        <h4>{item.title}</h4>
-                                        <p>Tác giả: {item.author}</p>
+                                        <h4>{item.name}</h4>
                                         <p>Số lượng: {item.quantity}</p>
                                     </div>
                                     <div className="order-item-price">
-                                        {item.price.toLocaleString('vi-VN')}đ
+                                        {(item.totalPrice || 0).toLocaleString('vi-VN')}đ
                                     </div>
                                 </div>
                             ))}
@@ -276,18 +279,21 @@ const Cart: React.FC = () => {
                                     <circle cx="5.5" cy="18.5" r="2.5" />
                                     <circle cx="18.5" cy="18.5" r="2.5" />
                                 </svg>
-                                <span>Dự kiến giao: {order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString('vi-VN') : 'N/A'}</span>
+                                <span>
+                                    {order.fullName && `Người nhận: ${order.fullName}`}
+                                    {order.phone && ` - ${order.phone}`}
+                                </span>
                             </div>
                             <div className="order-total">
                                 <span>Tổng tiền:</span>
-                                <span className="total-amount">{order.total.toLocaleString('vi-VN')}đ</span>
+                                <span className="total-amount">{(order.toalPrice || 0).toLocaleString('vi-VN')}đ</span>
                             </div>
                         </div>
 
                         <div className="order-actions">
                             <button 
                                 className="btn-confirm-delivery"
-                                onClick={() => handleConfirmDelivery(order.id)}
+                                onClick={() => handleConfirmDelivery(order.ordersId)}
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -302,8 +308,15 @@ const Cart: React.FC = () => {
         );
     };
 
-    // Render Đơn hàng đã giao
     const renderCompletedTab = () => {
+        if (isLoadingOrders) {
+            return (
+                <div className="empty-state">
+                    <p>Đang tải đơn hàng...</p>
+                </div>
+            );
+        }
+
         if (completedOrders.length === 0) {
             return (
                 <div className="empty-state">
@@ -322,26 +335,31 @@ const Cart: React.FC = () => {
         return (
             <div className="orders-list">
                 {completedOrders.map((order) => (
-                    <div key={order.id} className="order-card">
+                    <div key={order.ordersId} className="order-card">
                         <div className="order-header">
                             <div className="order-info">
-                                <span className="order-id">Mã đơn: {order.id}</span>
-                                <span className="order-date">Ngày đặt: {new Date(order.orderDate).toLocaleDateString('vi-VN')}</span>
+                                <span className="order-id">Mã đơn: #{order.ordersId}</span>
+                                <span className="order-date">
+                                    Ngày đặt: {order.createTime ? new Date(order.createTime).toLocaleDateString('vi-VN') : 'N/A'}
+                                </span>
                             </div>
                             <span className="status-badge completed">Đã giao hàng</span>
                         </div>
 
                         <div className="order-items">
-                            {order.items.map((item, index) => (
-                                <div key={index} className="order-item">
-                                    <img src={item.imageUrl} alt={item.title} className="order-item-image" />
+                            {order.orderDetails?.map((item) => (
+                                <div key={item.id} className="order-item">
+                                    <img 
+                                        src={item.imageLink || 'https://via.placeholder.com/60'} 
+                                        alt={item.name} 
+                                        className="order-item-image" 
+                                    />
                                     <div className="order-item-details">
-                                        <h4>{item.title}</h4>
-                                        <p>Tác giả: {item.author}</p>
+                                        <h4>{item.name}</h4>
                                         <p>Số lượng: {item.quantity}</p>
                                     </div>
                                     <div className="order-item-price">
-                                        {item.price.toLocaleString('vi-VN')}đ
+                                        {(item.totalPrice || 0).toLocaleString('vi-VN')}đ
                                     </div>
                                 </div>
                             ))}
@@ -353,11 +371,14 @@ const Cart: React.FC = () => {
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                                     <polyline points="22,4 12,14.01 9,11.01" />
                                 </svg>
-                                <span>Đã giao: {order.deliveredDate ? new Date(order.deliveredDate).toLocaleDateString('vi-VN') : 'N/A'}</span>
+                                <span>
+                                    {order.fullName && `Người nhận: ${order.fullName}`}
+                                    {order.phone && ` - ${order.phone}`}
+                                </span>
                             </div>
                             <div className="order-total">
                                 <span>Tổng tiền:</span>
-                                <span className="total-amount">{order.total.toLocaleString('vi-VN')}đ</span>
+                                <span className="total-amount">{(order.toalPrice || 0).toLocaleString('vi-VN')}đ</span>
                             </div>
                         </div>
 
@@ -435,13 +456,14 @@ const Cart: React.FC = () => {
                 onClose={() => setIsCheckoutModalOpen(false)}
                 items={state.items.map(item => ({
                     id: item.book.id,
-                    title: item.book.title,
+                    title: item.book.title || item.book.name,
                     quantity: item.quantity,
-                    price: item.book.price,
-                    imageUrl: item.book.imageUrl
+                    price: item.book.price ?? item.book.salePrice,
+                    imageUrl: item.book.imageUrl ?? item.book.imageLink ?? ''
                 }))}
                 total={state.total}
                 onConfirm={handleConfirmCheckout}
+                cartId={state.cartId ?? undefined}
             />
         </div>
     );

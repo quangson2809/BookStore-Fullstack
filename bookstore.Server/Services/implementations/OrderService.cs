@@ -12,11 +12,9 @@ namespace bookstore.Server.Services.implementations
 {
     public class OrderService : IOrderService
     {
-        // Implement invoice-related methods here
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
 
-        private int _currentCartId;
         public OrderService(
             IOrderRepository orderRepository,
             ICartRepository cartRepository)

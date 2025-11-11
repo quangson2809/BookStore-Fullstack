@@ -1,4 +1,5 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { orderService, CreateOrderRequest } from '@/services/orderService';
 import './CheckoutModal.css';
 
 interface CheckoutItem {
@@ -15,6 +16,7 @@ interface CheckoutModalProps {
     items: CheckoutItem[];
     total: number;
     onConfirm: (shippingInfo: ShippingInfo) => void;
+    cartId?: number;
 }
 
 export interface ShippingInfo {
@@ -29,11 +31,18 @@ export interface ShippingInfo {
     paymentMethod: 'cod' | 'banking';
 }
 
-const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, items, total, onConfirm }) => {
+const CheckoutModal: React.FC<CheckoutModalProps> = ({ 
+    isOpen, 
+    onClose, 
+    items, 
+    total, 
+    onConfirm,
+    cartId 
+}) => {
     const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
-        fullName: 'Nguyễn Văn A',
-        phone: '0123456789',
-        email: 'nguyenvana@email.com',
+        fullName: '',
+        phone: '',
+        email: '',
         address: '',
         ward: '',
         district: '',
@@ -43,6 +52,27 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, items, t
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof ShippingInfo, string>>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Load user info from localStorage when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            const userInfo = localStorage.getItem('userInfo');
+            if (userInfo) {
+                try {
+                    const user = JSON.parse(userInfo);
+                    setShippingInfo(prev => ({
+                        ...prev,
+                        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || '',
+                        phone: user.phone || '',
+                        email: user.email || ''
+                    }));
+                } catch (error) {
+                    console.error('Error parsing user info:', error);
+                }
+            }
+        }
+    }, [isOpen]);
 
     const cities = [
         'Hồ Chí Minh',
@@ -65,6 +95,18 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, items, t
     const validateForm = (): boolean => {
         const newErrors: Partial<Record<keyof ShippingInfo, string>> = {};
 
+        // Validate customer info
+        if (!shippingInfo.fullName.trim()) {
+            newErrors.fullName = 'Vui lòng nhập họ tên';
+        }
+        if (!shippingInfo.phone.trim()) {
+            newErrors.phone = 'Vui lòng nhập số điện thoại';
+        }
+        if (!shippingInfo.email.trim()) {
+            newErrors.email = 'Vui lòng nhập email';
+        }
+
+        // Validate shipping address
         if (!shippingInfo.address.trim()) {
             newErrors.address = 'Vui lòng nhập địa chỉ';
         }
@@ -82,11 +124,44 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, items, t
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            onConfirm(shippingInfo);
+        if (!validateForm()) {
+            return;
+        }
+
+        if (!cartId) {
+            alert('Không tìm thấy giỏ hàng. Vui lòng thử lại.');
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+
+            const fullAddress = `${shippingInfo.address}, ${shippingInfo.ward}, ${shippingInfo.district}, ${shippingInfo.city}`;
+            
+            const orderData: CreateOrderRequest = {
+                fullName: shippingInfo.fullName,
+                phone: shippingInfo.phone,
+                address: fullAddress,
+                email: shippingInfo.email
+            };
+
+            const response = await orderService.createOrder(cartId, orderData);
+
+            if (response.success) {
+                onConfirm(shippingInfo);
+                alert(response.message || 'Đặt hàng thành công!');
+                onClose();
+            } else {
+                alert(response.message || 'Đặt hàng thất bại. Vui lòng thử lại.');
+            }
+        } catch (error) {
+            console.error('Error creating order:', error);
+            alert('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -327,15 +402,31 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, items, t
                 </div>
 
                 <div className="checkout-modal-footer">
-                    <button type="button" className="btn-cancel" onClick={onClose}>
+                    <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>
                         Hủy
                     </button>
-                    <button type="submit" className="btn-confirm" onClick={handleSubmit}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                            <polyline points="22,4 12,14.01 9,11.01" />
-                        </svg>
-                        Xác nhận đặt hàng
+                    <button 
+                        type="submit" 
+                        className="btn-confirm" 
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                </svg>
+                                Đang xử lý...
+                            </>
+                        ) : (
+                            <>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                    <polyline points="22,4 12,14.01 9,11.01" />
+                                </svg>
+                                Xác nhận đặt hàng
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
