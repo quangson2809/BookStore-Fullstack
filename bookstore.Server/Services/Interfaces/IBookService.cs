@@ -12,5 +12,6 @@ namespace bookstore.Server.Services.Interfaces
         Task<BookDetailResponse> GetBookDetail(int bookId);
         Task<IEnumerable<BookHomeOverviewResponse>> GetAllBook();
         Task<StatusResponse> UpdateBook(int BookId,BookUpdateRequest request, List<IFormFile> Images);
+        Task<IEnumerable<BookHomeOverviewResponse>> GetByFilter(int? CategoryId, string? keyWord);
     }
 }

@@ -75,5 +75,11 @@ namespace bookstore.Server.Controllers
             }
         }
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetByFilter(int? categoryId,string? keyword)
+        {
+            var response = await _bookService.GetByFilter(categoryId, keyword);
+            return Ok(response);
+        }
     }
 }

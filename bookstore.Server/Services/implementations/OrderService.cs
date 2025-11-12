@@ -6,6 +6,7 @@ using bookstore.Server.Repositories;
 using bookstore.Server.Repositories.Implementations;
 using bookstore.Server.Repositories.Interfaces;
 using bookstore.Server.Services.Interfaces;
+using bookstore.Server.SessionCookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace bookstore.Server.Services.implementations
@@ -14,17 +15,24 @@ namespace bookstore.Server.Services.implementations
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
-
+        private readonly ICartService _cartService;
+        private readonly SessionManager _sessionManager;
+        private  int? _currentCartId;
         public OrderService(
             IOrderRepository orderRepository,
-            ICartRepository cartRepository)
+            ICartRepository cartRepository,
+            SessionManager sessionManager,
+            ICartService cartService)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
+            _sessionManager = sessionManager;
+            _cartService = cartService;
         }
 
         public async Task<StatusResponse> CreateAsync(int CartId, OrderCreateRequest Request)
         {
+          
             Cart cart =  await _cartRepository.GetByIdAsync(CartId);
             if (cart == null || cart.CartDetails == null || cart.CartDetails.Count ==0)
             {
@@ -42,7 +50,7 @@ namespace bookstore.Server.Services.implementations
                 OrdersStatus = "Pending",
                 OrdersDetails = new List<OrdersDetail>(),
             };
-            foreach( CartDetail cd in cart.CartDetails)
+            foreach( CartDetail cd in cart.CartDetails.ToList())
             {
                 if (cd.Quantity > cd.Book.StockQuantity)
                     throw new Exception($"{cd.Book.BookName}số lượng trong kho còn {cd.Book.StockQuantity}");
@@ -54,7 +62,10 @@ namespace bookstore.Server.Services.implementations
                 };
                 cd.Book.StockQuantity -= cd.Quantity;
                 order.OrdersDetails.Add(od);
+                await _cartRepository.RemoveBookFromCart(CartId, cd.BookId);
+
             }
+
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
             return new StatusResponse(true, "Đặt hàng thành công");

@@ -15,11 +15,11 @@ namespace bookstore.Server.Services.implementations
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRespository;
-        private readonly IImageRepoeitory _imageRepository;
+        private readonly IImageRepository _imageRepository;
 
         private IFileService _fileService;
 
-        public BookService( IBookRepository bookRepository,IImageRepoeitory imageRepoeitory, IFileService fileService)
+        public BookService( IBookRepository bookRepository,IImageRepository imageRepoeitory, IFileService fileService)
         {
             _fileService = fileService;
             _bookRespository = bookRepository;
@@ -102,6 +102,35 @@ namespace bookstore.Server.Services.implementations
             }
             BookDetailResponse bookDetailResponse = new BookDetailResponse(book);
             return bookDetailResponse;
+        }
+
+        public async Task<IEnumerable<BookHomeOverviewResponse>> GetByFilter(int? CategoryId, string? keyWord)
+        {
+            List<Book> books = (List<Book>) await _bookRespository.GetByFilter(CategoryId, keyWord);
+            List<BookHomeOverviewResponse> list = new List<BookHomeOverviewResponse>();
+            foreach (Book book in books)
+            {
+                BookHomeOverviewResponse item = new BookHomeOverviewResponse()
+                {
+                    Id = book.BookId,
+                    Name = book.BookName,
+                    Category = book.Category != null ? book.Category.CategoryName : "",
+                    Author = book.Author,
+                    Publisher = book.Publisher,
+                    SalePrice = (int)book.SalePrice,
+                    OriginalPrice = (int)book.OriginalPrice,
+                    Quantity = (int)book.StockQuantity,
+                    Language = book.Language
+                };
+
+                foreach (var bookimage in book.BookImages)
+                {
+                    item.ImageLink = bookimage.BookImageUrl;
+                    break;
+                }
+                list.Add(item);
+            }
+            return list;
         }
 
         public async Task<StatusResponse> UpdateBook(int BookId, BookUpdateRequest request, List<IFormFile> Images)

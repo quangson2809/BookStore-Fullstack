@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bookstore.Server.Repositories.Implementations
 {
-    public class ImageRepoeitory : GenericRepository<BookImage>, IImageRepoeitory
+    public class ImageRepoeitory : GenericRepository<BookImage>, IImageRepository
     {
         public ImageRepoeitory(BookStoreDbContext dbContext) : base(dbContext)
         {

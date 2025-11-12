@@ -222,3 +222,13 @@ C:\Users\Admin>curl -X GET http://localhost:5121/api/Order/2
     ]
   }
 ]
+
+Filter:
+- http://localhost:5121/api/category/categories
+[{"id":1,"name":"Văn Học"},{"id":2,"name":"Kinh tế "},
+{"id":3,"name":"Thiếu nhi"},{"id":4,"name":"Khoa học "},{"id":5,"name":"Công nghệ"},
+{"id":6,"name":"Tâm lý"},{"id":7,"name":"Lịch sử"},{"id":8,"name":"Ngoại ngữ"}]
+
+- http://localhost:5121/api/Book/filter?categoryId=2&keyword=sách
+[{"id":1,"imageLink":null,"name":"Sách mới","category":"Kinh tế ","author":"Nguyễn Văn A",
+"publisher":"NXB Trẻ","salePrice":90000,"originalPrice":120000,"quantity":100,"language":"Tiếng Việt"}]

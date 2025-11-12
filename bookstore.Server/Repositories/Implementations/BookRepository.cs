@@ -15,7 +15,23 @@ namespace bookstore.Server.Repositories.Implementations
         {
             await _table.AddAsync(book);
         }
+        public async Task<IEnumerable<Book>> GetByFilter (int? CategoryId, string? keyWord)
+        {
+            var query = _table.Include(book => book.Category)
+                            .AsQueryable();
 
+            if (CategoryId.HasValue)
+            {
+                query = query.Where(book => book.CategoryId == CategoryId);
+            }
+            if (!string.IsNullOrWhiteSpace(keyWord))
+            {
+                query = query.Where(book => book.BookName.Contains(keyWord));
+            }
+
+            return await query.ToListAsync();
+        }
+        
         public async Task<IEnumerable<Book>> GetAllAsync()
         {
              return await _table
